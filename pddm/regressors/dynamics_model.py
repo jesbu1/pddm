@@ -94,6 +94,7 @@ class Dyn_Model:
                 self.params.num_fc_layers, self.params.depth_fc_layers, self.tf_datatype, scope=i)
             out = mean + tf.random.normal(tf.shape(mean)) * tf.math.sqrt(tf.math.exp(logvar))
             self.curr_nn_outputs.append(out)
+            #self.curr_nn_outputs.append(mean)
 
             # loss of this network's predictions
             inv_var = tf.math.exp(-logvar)

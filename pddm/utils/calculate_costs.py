@@ -103,13 +103,16 @@ def calculate_costs(resulting_states_list, actions, reward_func,
         # 1-a0 1-a1 1-a2 ... 2-a0 2-a1 2-a2 ... 3-a0 3-a1 3-a2...
         new_costs.append(costs[i::N])  #start, stop, step
 
+    new_costs = np.array(new_costs)
+    ######### Trajectory sampling aggregation
+    new_costs = np.reshape(new_costs, (int(N//traj_sampling_ratio), -1))
+
     #mean and std cost (across ensemble) [N,]
     mean_cost = np.mean(new_costs, 1)
     std_cost = np.std(new_costs, 1)
 
     #####################################################################################################    
     # TODO: Change these temp vars
-    #import pdb; pdb.set_trace()
     #no_catastrophe_pred = True
     #percentile = 50
     #if no_catastrophe_pred:
