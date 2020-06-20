@@ -89,11 +89,9 @@ class Dyn_Model:
         for i in range(self.ensemble_size):
 
             # forward pass through this network
-            this_output = feedforward_network(
+            mean, logvar, max_logvar, min_logvar = feedforward_network(
                 self.inputs_clipped[i], self.inputSize, self.outputSize,
                 self.params.num_fc_layers, self.params.depth_fc_layers, self.tf_datatype, scope=i)
-            # First half is mean, second is logvar
-            mean, logvar = this_output[:, :self.outputSize], this_output[:, self.outputSize:]
             out = mean + tf.random.normal(tf.shape(mean)) * tf.math.exp(logvar)
             self.curr_nn_outputs.append(out)
 
@@ -102,7 +100,9 @@ class Dyn_Model:
 
             this_mse = tf.reduce_mean(
                 tf.square(self.labels_ - mean)) * inv_var + logvar
-            self.mses.append(this_mse)
+            logvar_loss = 0.01 * (tf.reduce_sum(max_logvar) - tf.reduce_sum(min_logvar))
+            loss = this_mse + logvar_loss
+            self.mses.append(loss)
 
             # this network's weights
             this_theta = tf.get_collection(

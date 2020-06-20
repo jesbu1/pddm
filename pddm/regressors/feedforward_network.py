@@ -14,6 +14,7 @@
 
 
 import tensorflow as tf
+import numpy as np
 
 
 def feedforward_network(inputStates, inputSize, outputSize, num_fc_layers,
@@ -30,6 +31,8 @@ def feedforward_network(inputStates, inputSize, outputSize, num_fc_layers,
         initializer = tf.contrib.layers.xavier_initializer(
             uniform=False, seed=None, dtype=tf_datatype)
         fc = tf.contrib.layers.fully_connected
+        max_logvar = tf.Variable(np.ones([1, outputSize])/2., dtype=tf.float32, name="max_log_var")
+        min_logvar = tf.Variable(-np.ones([1, outputSize])*10., dtype=tf.float32, name="min_log_var")
 
         # make hidden layers
         for i in range(num_fc_layers):
@@ -62,5 +65,8 @@ def feedforward_network(inputStates, inputSize, outputSize, num_fc_layers,
             biases_initializer=initializer,
             reuse=reuse,
             trainable=True)
+        mean, logvar = z[:, :outputSize], z[:, outputSize:]
+        logvar = max_logvar - tf.nn.softplus(max_logvar - logvar)
+        logvar = min_logvar + tf.nn.softplus(logvar - min_logvar)
 
-    return z
+    return mean, logvar, max_logvar, min_logvar
