@@ -110,7 +110,7 @@ class Dyn_Model:
 
             # train step for this network
             gv = [(g, v) for g, v in self.opt.compute_gradients(
-                this_mse, this_theta) if g is not None]
+                loss, this_theta) if g is not None]
             self.train_steps.append(self.opt.apply_gradients(gv))
 
         self.predicted_outputs = self.curr_nn_outputs
