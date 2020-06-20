@@ -91,6 +91,7 @@ def convert_to_parser_args(args_source=sys.argv[1:]):
     parser.add_argument('--horizon', type=int, default=7) #planning horizon
     parser.add_argument('--num_control_samples', type=int, default=700) #number of candidate ac sequences
     parser.add_argument('--controller_type', type=str, default='mppi') #rand, cem, mppi
+    parser.add_argument('--traj_sampling_ratio', type=int, default=4) #traj sampling to match PETS
 
     # cem
     parser.add_argument('--cem_max_iters', type=int, default=3) #number of iters

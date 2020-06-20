@@ -33,6 +33,7 @@ class MPPI(object):
         self.K = params.K
         self.horizon = params.horizon
         self.N = params.num_control_samples
+        self.traj_sampling_ratio = params.traj_sampling_ratio
         self.rand_policy = rand_policy
         self.use_ground_truth_dynamics = use_ground_truth_dynamics
         self.dyn_models = dyn_models
@@ -157,6 +158,11 @@ class MPPI(object):
             resulting_states = np.swapaxes(resulting_states, 0, 1)
             resulting_states_list = [resulting_states]
         else:
+            ##################################################
+            ### Trajectory sampling edit, every self.traj_sampling_ratio is a new set of actions
+            ##################################################
+            #all_acs = np.repeat(all_acs, self.traj_sampling_ratio, axis=0)
+
             resulting_states_list = self.dyn_models.do_forward_sim(
                 [curr_state_K, 0], np.copy(all_acs))
             resulting_states_list = np.swapaxes(resulting_states_list, 0,1)  #[ensSize, horizon+1, N, statesize]
@@ -167,7 +173,7 @@ class MPPI(object):
 
         # calculate costs [N,]
         costs, mean_costs, std_costs = calculate_costs(resulting_states_list, all_samples,
-                                self.reward_func, evaluating, take_exploratory_actions)
+                                self.reward_func, evaluating, take_exploratory_actions, self.traj_sampling_ratio)
 
         # uses all paths to update action mean (for horizon steps)
         # Note: mppi_update needs rewards, so pass in -costs

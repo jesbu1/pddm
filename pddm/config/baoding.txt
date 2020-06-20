@@ -89,6 +89,7 @@
 'horizon': [7],
 'num_control_samples': [700],
 'controller_type': ['mppi'],
+'traj_sampling_ratio': [4],
 
 ## cem
 'cem_max_iters': [3],

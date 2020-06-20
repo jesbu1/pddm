@@ -56,7 +56,7 @@ def feedforward_network(inputStates, inputSize, outputSize, num_fc_layers,
         # make output layer
         z = fc(
             h_i,
-            num_outputs=outputSize,
+            num_outputs=outputSize * 2,
             activation_fn=None,
             weights_initializer=initializer,
             biases_initializer=initializer,

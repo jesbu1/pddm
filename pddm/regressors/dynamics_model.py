@@ -92,11 +92,16 @@ class Dyn_Model:
             this_output = feedforward_network(
                 self.inputs_clipped[i], self.inputSize, self.outputSize,
                 self.params.num_fc_layers, self.params.depth_fc_layers, self.tf_datatype, scope=i)
-            self.curr_nn_outputs.append(this_output)
+            # First half is mean, second is logvar
+            mean, logvar = this_output[:, :self.outputSize], this_output[:, self.outputSize:]
+            out = mean + tf.random.normal(tf.shape(mean)) * tf.math.exp(logvar)
+            self.curr_nn_outputs.append(out)
 
             # loss of this network's predictions
+            inv_var = tf.math.exp(-logvar)
+
             this_mse = tf.reduce_mean(
-                tf.square(self.labels_ - this_output))
+                tf.square(self.labels_ - mean)) * inv_var + logvar
             self.mses.append(this_mse)
 
             # this network's weights
