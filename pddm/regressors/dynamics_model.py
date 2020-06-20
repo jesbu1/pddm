@@ -92,7 +92,7 @@ class Dyn_Model:
             mean, logvar, max_logvar, min_logvar = feedforward_network(
                 self.inputs_clipped[i], self.inputSize, self.outputSize,
                 self.params.num_fc_layers, self.params.depth_fc_layers, self.tf_datatype, scope=i)
-            out = mean + tf.random.normal(tf.shape(mean)) * tf.math.exp(logvar)
+            out = mean + tf.random.normal(tf.shape(mean)) * tf.math.sqrt(tf.math.exp(logvar))
             self.curr_nn_outputs.append(out)
 
             # loss of this network's predictions
