@@ -161,7 +161,6 @@ class MPPI(object):
             ##################################################
             ### Trajectory sampling edit, every self.traj_sampling_ratio is a new set of actions
             ##################################################
-            import pdb; pdb.set_trace()
             all_acs = np.repeat(all_acs, self.traj_sampling_ratio, axis=0)
 
             resulting_states_list = self.dyn_models.do_forward_sim(
