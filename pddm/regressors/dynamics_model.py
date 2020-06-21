@@ -98,9 +98,8 @@ class Dyn_Model:
 
             # loss of this network's predictions
             inv_var = tf.math.exp(-logvar)
-
             this_mse = tf.reduce_mean(
-                tf.square(self.labels_ - mean)) * inv_var + logvar
+                tf.square(self.labels_ - mean) * inv_var + logvar)
             logvar_loss = 0.01 * (tf.reduce_sum(max_logvar) - tf.reduce_sum(min_logvar))
             loss = this_mse + logvar_loss
             self.mses.append(loss)
