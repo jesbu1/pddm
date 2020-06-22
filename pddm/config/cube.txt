@@ -69,7 +69,7 @@
 
 ## arch
 'num_fc_layers': [2],
-'depth_fc_layers': [250],
+'depth_fc_layers': [500],
 'ensemble_size': [3],
 'K': [1],
 
@@ -87,7 +87,7 @@
 
 ## MPC
 'horizon': [7],
-'num_control_samples': [1000],
+'num_control_samples': [700],
 'controller_type': ['mppi'],
 
 ## cem
@@ -97,6 +97,6 @@
 ## mppi
 'mppi_kappa': [10],
 'mppi_mag_noise': [0.9],
-'mppi_beta': [0.6],
+'mppi_beta': [0.7],
 
 }
