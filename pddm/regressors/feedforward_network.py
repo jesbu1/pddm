@@ -68,5 +68,4 @@ def feedforward_network(inputStates, inputSize, outputSize, num_fc_layers,
         mean, logvar = z[:, :outputSize], z[:, outputSize:]
         logvar = max_logvar - tf.nn.softplus(max_logvar - logvar)
         logvar = min_logvar + tf.nn.softplus(logvar - min_logvar)
-
     return mean, logvar, max_logvar, min_logvar

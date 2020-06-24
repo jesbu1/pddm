@@ -20,6 +20,7 @@ import math
 
 #my imports
 from pddm.regressors.feedforward_network import feedforward_network
+import sys
 
 
 class Dyn_Model:
@@ -93,16 +94,19 @@ class Dyn_Model:
                 self.inputs_clipped[i], self.inputSize, self.outputSize,
                 self.params.num_fc_layers, self.params.depth_fc_layers, self.tf_datatype, scope=i)
             out = mean + tf.random.normal(tf.shape(mean)) * tf.math.sqrt(tf.math.exp(logvar))
-            self.curr_nn_outputs.append(out)
-            #self.curr_nn_outputs.append(mean)
+            #self.curr_nn_outputs.append(out)
+            self.curr_nn_outputs.append(mean)
 
             # loss of this network's predictions
             inv_var = tf.math.exp(-logvar)
-            this_mse = tf.reduce_mean(
+            true_loss = tf.reduce_mean(
                 tf.square(self.labels_ - mean) * inv_var + logvar)
+            this_mse = tf.reduce_mean(
+                tf.square(self.labels_ - mean))
             logvar_loss = 0.01 * (tf.reduce_sum(max_logvar) - tf.reduce_sum(min_logvar))
-            loss = this_mse + logvar_loss
-            self.mses.append(loss)
+            loss = true_loss + logvar_loss
+            #loss = true_loss
+            self.mses.append(this_mse)
 
             # this network's weights
             this_theta = tf.get_collection(
