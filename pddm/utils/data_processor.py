@@ -30,6 +30,7 @@ class DataProcessor:
         self.params = params
         self.normalization_data = MeanStd()
         self.array_datatype = partial(np.array, dtype=params.np_datatype)
+        self.catastrophe_pred = params.catastrophe_pred
 
         #for duplicating data from the rollouts, by switching object info
         self.duplicateData_switchObjs = duplicateData_switchObjs
@@ -71,8 +72,12 @@ class DataProcessor:
         self.normalization_data.std_y = np.std(
             np.concatenate(temp_y, 0), axis=0)
 
-        self.normalization_data.mean_z = np.mean(temp_z, axis=0)
-        self.normalization_data.std_z = np.std(temp_z, axis=0)
+        if self.catastrophe_pred:
+            self.normalization_data.mean_z = np.mean(temp_z[..., :-1], axis=0)
+            self.normalization_data.std_z = np.std(temp_z[..., :-1], axis=0)
+        else:
+            self.normalization_data.mean_z = np.mean(temp_z, axis=0)
+            self.normalization_data.std_z = np.std(temp_z, axis=0)
 
         #update the mean/std values of model
         self.update_model_normalization(model)
@@ -85,8 +90,13 @@ class DataProcessor:
                              ) / self.normalization_data.std_x
             y_preprocessed = (dataset.dataY - self.normalization_data.mean_y
                              ) / self.normalization_data.std_y
-            z_preprocessed = (dataset.dataZ - self.normalization_data.mean_z
-                             ) / self.normalization_data.std_z
+            if self.catastrophe_pred:
+                z_preprocessed = (dataset.dataZ[..., :-1] - self.normalization_data.mean_z
+                                ) / self.normalization_data.std_z
+                z_preprocessed = np.concatenate((z_preprocessed, dataset.dataZ[..., -1:]), axis=-1)
+            else:
+                z_preprocessed = (dataset.dataZ - self.normalization_data.mean_z
+                                ) / self.normalization_data.std_z
 
             #clip actions to (-1,1)
             y_preprocessed = np.clip(y_preprocessed, -1, 1)
@@ -147,7 +157,10 @@ class DataProcessor:
         #add some supervised learning noise (to help model training)
         if self.params.make_training_dataset_noisy:
             dataX = add_noise(dataX, self.params.noiseToSignal)
-            dataZ = add_noise(dataZ, self.params.noiseToSignal)
+            if self.catastrophe_pred:
+                dataZ[..., :-1] = add_noise(dataZ[..., :-1], self.params.noiseToSignal)
+            else:
+                dataZ = add_noise(dataZ, self.params.noiseToSignal)
 
         ###############################
         ### double the data
@@ -174,8 +187,13 @@ class DataProcessor:
             #switch for dataZ
             dataZ_second[:, obj_start1:obj_start1 + 6] = dataZ_temp[:, obj_start2:obj_start2 + 6]
             dataZ_second[:, obj_start2:obj_start2 + 6] = dataZ_temp[:, obj_start1:obj_start1 + 6]
-            dataZ_second[:, target_start1:target_start1 + 2] = dataZ_temp[:, target_start2:]
-            dataZ_second[:, target_start2:] = dataZ_temp[:, target_start1:target_start1 + 2]
+            if self.catastrophe_pred:
+                target_start1, target_start2, = target_start1 - 1, target_start2 - 1
+                dataZ_second[:, target_start1:target_start1 + 2] = dataZ_temp[:, target_start2:-1]
+                dataZ_second[:, target_start2:-1] = dataZ_temp[:, target_start1:target_start1 + 2]
+            else:
+                dataZ_second[:, target_start1:target_start1 + 2] = dataZ_temp[:, target_start2:]
+                dataZ_second[:, target_start2:] = dataZ_temp[:, target_start1:target_start1 + 2]
 
             #concat
             dataX = np.concatenate([dataX, dataX_second])

@@ -83,6 +83,10 @@ def convert_to_parser_args(args_source=sys.argv[1:]):
     parser.add_argument('--nEpoch', type=int, default=40) #epochs of training
     parser.add_argument('--nEpoch_init', type=int, default=40) #epochs of training for 1st iter
 
+    # CARL Modification
+    parser.add_argument('--catastrophe_pred', action="store_true")
+    parser.add_argument('--finetuning', action="store_true")
+
     #######################
     ### controller
     #######################
@@ -101,6 +105,7 @@ def convert_to_parser_args(args_source=sys.argv[1:]):
     parser.add_argument('--mppi_kappa', type=float, default=1.0) #reward weighting
     parser.add_argument('--mppi_mag_noise', type=float, default=0.9) #magnitude of sampled noise
     parser.add_argument('--mppi_beta', type=float, default=0.8) #smoothing
+
 
     args = parser.parse_args(args_source)
     return args

@@ -32,7 +32,7 @@
 'num_trajectories_per_iter': [30],
 
 ## continue
-'continue_run': [117],
+'continue_run': [-1],
 'continue_run_filepath': ['/home/jesse/pddm/pddm/output_no_noise/baoding'],
 
 ## some T/F options
@@ -80,6 +80,9 @@
 'lr': [0.001],
 'nEpoch': [40],
 'nEpoch_init': [40],
+
+## CARL
+'catastrophe_pred': [True],
 
 ##########################
 ##### controller

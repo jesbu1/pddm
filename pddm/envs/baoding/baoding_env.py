@@ -305,6 +305,8 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # get obs/rew/done/score
         obs = self._get_obs()
         reward, done = self.get_reward(obs, a)
+        catastrophe = done
+        obs = np.concatenate((obs, [float(catastrophe)]))
         score = self.get_score(obs)
         env_info = {'time': self.time,
                     'obs_dict': self.obs_dict,
@@ -371,7 +373,7 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         #### reset hand and objects
         self.robot.reset(self, reset_pose, reset_vel)
         self.sim.forward()
-        return self._get_obs()
+        return np.concatenate((self._get_obs(), [0.]))
 
     def create_goal_trajectory(self):
 

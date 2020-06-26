@@ -80,7 +80,6 @@ def run_job(args, save_dir=None):
         ########################################
         ### create loader, env, rand policy
         ########################################
-
         loader = Loader(save_dir)
         env, dt_from_xml = create_env(env_name)
         args.dt_from_xml = dt_from_xml
@@ -210,8 +209,13 @@ def run_job(args, save_dir=None):
         while counter < num_iters:
 
             #init vars for this iteration
-            saver_data = DataPerIter()
-            saver.iter_num = counter
+            if counter % 20 == 0 or counter == num_iters - 1:
+                save = True
+            else:
+                save = False
+            if save:
+                saver_data = DataPerIter()
+                saver.iter_num = counter
 
             #onPolicy validation doesn't exist yet, so just make it same as rand validation
             if counter==0:
@@ -369,9 +373,9 @@ def run_job(args, save_dir=None):
 
             # visualize, if desired
             if args.visualize_MPC_rollout:
-                print("\n\nPAUSED FOR VISUALIZATION. Continue when ready to visualize.")
-                import IPython
-                IPython.embed()
+                #print("\n\nPAUSED FOR VISUALIZATION. Continue when ready to visualize.")
+                #import IPython
+                #IPython.embed()
                 for vis_index in range(len(rollouts_info)):
                     visualize_rendering(rollouts_info[vis_index], env, args)
 
@@ -425,19 +429,20 @@ def run_job(args, save_dir=None):
             trainingLoss_perIter.append(training_loss)
 
             ### stage relevant info for saving
-            saver_data.training_numData = trainingData_perIter
-            saver_data.training_losses = trainingLoss_perIter
-            saver_data.training_lists_to_save = training_lists_to_save
-            # Note: the on-policy rollouts include curr iter's rollouts
-            # (so next iter can be directly trained on these)
-            saver_data.train_rollouts_onPol = rollouts_trainOnPol
-            saver_data.val_rollouts_onPol = rollouts_valOnPol
-            saver_data.normalization_data = data_processor.get_normalization_data()
-            saver_data.counter = counter
+            if save:
+                saver_data.training_numData = trainingData_perIter
+                saver_data.training_losses = trainingLoss_perIter
+                saver_data.training_lists_to_save = training_lists_to_save
+                # Note: the on-policy rollouts include curr iter's rollouts
+                # (so next iter can be directly trained on these)
+                saver_data.train_rollouts_onPol = rollouts_trainOnPol
+                saver_data.val_rollouts_onPol = rollouts_valOnPol
+                saver_data.normalization_data = data_processor.get_normalization_data()
+                saver_data.counter = counter
 
-            ### save all info from this training iteration
-            saver.save_model()
-            saver.save_training_info(saver_data)
+                ### save all info from this training iteration
+                saver.save_model()
+                saver.save_training_info(saver_data)
 
             #########################################################
             ### save everything about this iter of MPC rollouts
@@ -447,11 +452,12 @@ def run_job(args, save_dir=None):
             rew_perIter.append([np.mean(list_rewards), np.std(list_rewards)])
             scores_perIter.append([np.mean(list_scores), np.std(list_scores)])
 
-            # save
-            saver_data.rollouts_rewardsPerIter = rew_perIter
-            saver_data.rollouts_scoresPerIter = scores_perIter
-            saver_data.rollouts_info = rollouts_info
-            saver.save_rollout_info(saver_data)
+            if save:
+                # save
+                saver_data.rollouts_rewardsPerIter = rew_perIter
+                saver_data.rollouts_scoresPerIter = scores_perIter
+                saver_data.rollouts_info = rollouts_info
+                saver.save_rollout_info(saver_data)
             counter = counter + 1
 
             firstTime = False

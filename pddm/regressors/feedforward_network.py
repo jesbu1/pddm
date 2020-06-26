@@ -59,13 +59,15 @@ def feedforward_network(inputStates, inputSize, outputSize, num_fc_layers,
         # make output layer
         z = fc(
             h_i,
-            num_outputs=outputSize * 2,
+            num_outputs=outputSize,
             activation_fn=None,
             weights_initializer=initializer,
             biases_initializer=initializer,
             reuse=reuse,
             trainable=True)
-        mean, logvar = z[:, :outputSize], z[:, outputSize:]
-        logvar = max_logvar - tf.nn.softplus(max_logvar - logvar)
-        logvar = min_logvar + tf.nn.softplus(logvar - min_logvar)
-    return mean, logvar, max_logvar, min_logvar
+        #mean, logvar = z[:, :outputSize], z[:, outputSize:]
+        #out, catastrophe_prob = z[:, :outputSize - 1], z[:, outputSize - 1:]
+        #logvar = max_logvar - tf.nn.softplus(max_logvar - logvar)
+        #logvar = min_logvar + tf.nn.softplus(logvar - min_logvar)
+    #return mean, logvar, max_logvar, min_logvar
+    return z #out, catastrophe_prob

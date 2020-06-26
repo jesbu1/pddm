@@ -34,6 +34,8 @@ class MPPI(object):
         self.horizon = params.horizon
         self.N = params.num_control_samples
         self.traj_sampling_ratio = params.traj_sampling_ratio
+        self.catastrophe_pred = params.catastrophe_pred
+        self.finetuning = params.finetuning
         self.rand_policy = rand_policy
         self.use_ground_truth_dynamics = use_ground_truth_dynamics
         self.dyn_models = dyn_models
@@ -172,8 +174,9 @@ class MPPI(object):
         ############################
 
         # calculate costs [N,]
+        use_catastrophe_in_prediction = self.catastrophe_pred and self.finetuning
         costs, mean_costs, std_costs = calculate_costs(resulting_states_list, all_samples,
-                                self.reward_func, evaluating, take_exploratory_actions, self.traj_sampling_ratio)
+                                self.reward_func, evaluating, take_exploratory_actions, self.traj_sampling_ratio, use_catastrophe_in_prediction)
 
         # uses all paths to update action mean (for horizon steps)
         # Note: mppi_update needs rewards, so pass in -costs

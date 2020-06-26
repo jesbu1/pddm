@@ -50,6 +50,11 @@ class Dyn_Model:
         self.batchsize = self.params.batchsize
         self.K = self.params.K
         self.tf_datatype = self.params.tf_datatype
+        self.catastrophe_pred = self.params.catastrophe_pred
+
+        if not self.catastrophe_pred:
+            self.outputSize -= 1
+
 
         ## create placeholders
         self.create_placeholders()
@@ -90,23 +95,30 @@ class Dyn_Model:
         for i in range(self.ensemble_size):
 
             # forward pass through this network
-            mean, logvar, max_logvar, min_logvar = feedforward_network(
+            #mean, logvar, max_logvar, min_logvar = feedforward_network(
+            z = feedforward_network(
                 self.inputs_clipped[i], self.inputSize, self.outputSize,
                 self.params.num_fc_layers, self.params.depth_fc_layers, self.tf_datatype, scope=i)
-            out = mean + tf.random.normal(tf.shape(mean)) * tf.math.sqrt(tf.math.exp(logvar))
-            #self.curr_nn_outputs.append(out)
-            self.curr_nn_outputs.append(mean)
+            out, catastrophe_prob = z[:, :self.outputSize - 1], z[:, self.outputSize - 1:]
+            #out = mean + tf.random.normal(tf.shape(mean)) * tf.math.sqrt(tf.math.exp(logvar))
+            self.curr_nn_outputs.append(z)
+            #self.curr_nn_outputs.append(mean)
 
             # loss of this network's predictions
-            inv_var = tf.math.exp(-logvar)
-            true_loss = tf.reduce_mean(
-                tf.square(self.labels_ - mean) * inv_var + logvar)
+            #inv_var = tf.math.exp(-logvar)
+            #true_loss = tf.reduce_mean(
+            #    tf.square(self.labels_ - mean) * inv_var + logvar)
             this_mse = tf.reduce_mean(
-                tf.square(self.labels_ - mean))
-            logvar_loss = 0.01 * (tf.reduce_sum(max_logvar) - tf.reduce_sum(min_logvar))
-            loss = true_loss + logvar_loss
+                tf.square(self.labels_[..., :-1] - out))
+            catastrophe_pred_loss = tf.losses.sigmoid_cross_entropy(
+                self.labels_[..., -1:],
+                catastrophe_prob,
+            )
+            #logvar_loss = 0.01 * (tf.reduce_sum(max_logvar) - tf.reduce_sum(min_logvar))
+            #loss = true_loss + logvar_loss
             #loss = true_loss
-            self.mses.append(this_mse)
+            loss = this_mse + catastrophe_pred_loss
+            self.mses.append(loss)
 
             # this network's weights
             this_theta = tf.get_collection(
@@ -377,10 +389,15 @@ class Dyn_Model:
             model_outputs = self.sess.run([self.predicted_outputs],
                                         feed_dict={self.inputs_: inputs_list})
             model_output = np.array(model_outputs[0])  #[ens, N,sDim]
-
-            state_differences = np.multiply(
-                model_output, self.normalization_data.std_z
-            ) + self.normalization_data.mean_z
+            if self.catastrophe_pred:
+                state_differences = np.multiply(
+                    model_output[..., :-1], self.normalization_data.std_z
+                ) + self.normalization_data.mean_z
+                state_differences = np.concatenate((state_differences, model_output[..., -1:]), axis=-1)
+            else:
+                state_differences = np.multiply(
+                    model_output, self.normalization_data.std_z
+                ) + self.normalization_data.mean_z
 
             #update the state info
             curr_states_pastTimestep = curr_states_pastTimestep + state_differences
@@ -432,8 +449,13 @@ class Dyn_Model:
             model_output = model_outputs[0]
 
             #multiply by std and add mean back in
-            state_differences = (
-                model_output[0][0] * self.normalization_data.std_z) + self.normalization_data.mean_z
+            if self.catastrophe_pred:
+                state_differences = (
+                    model_output[0][0][..., :-1] * self.normalization_data.std_z) + self.normalization_data.mean_z
+                state_differences = np.concatenate((state_differences, model_output[0][0][..., -1:]), axis=-1)
+            else:
+                state_differences = (
+                    model_output[0][0] * self.normalization_data.std_z) + self.normalization_data.mean_z
 
             #update the state info
             curr_state = curr_state + state_differences

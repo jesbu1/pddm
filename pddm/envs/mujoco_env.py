@@ -85,7 +85,7 @@ class MujocoEnv(gym.Env):
             else:
                 self.obs_dim = np.sum([o.size for o in observation]) if type(observation) is tuple else observation.size
                 self.observation_space = spaces.Box(
-                -np.inf, np.inf, observation.shape, dtype=np.float32)
+                -np.inf, np.inf, (observation.shape[0],), dtype=np.float32)
 
         except TypeError:
             # Fallback case for gym 0.9.x
