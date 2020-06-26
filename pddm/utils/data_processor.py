@@ -172,7 +172,6 @@ class DataProcessor:
         if (self.duplicateData_switchObjs):
 
             obj_start1, obj_start2, target_start1, target_start2 = self.indices_for_switching
-            target_start1, target_start2, = target_start1 - 1, target_start2 - 1
 
             dataX_second = dataX.copy()
             dataX_temp = dataX.copy()
@@ -181,8 +180,11 @@ class DataProcessor:
             #switch for dataX
             dataX_second[:, :, obj_start1:obj_start1 + 6] = dataX_temp[:, :, obj_start2:obj_start2 + 6]
             dataX_second[:, :, obj_start2:obj_start2 + 6] = dataX_temp[:, :, obj_start1:obj_start1 + 6]
-            dataX_second[:, :, target_start1:target_start1 + 2] = dataX_temp[:, :, target_start2:-1]
-            dataX_second[:, :, target_start2:-1] = dataX_temp[:, :, target_start1:target_start1 + 2]
+            dataX_second[:, :, target_start1:target_start1 + 2] = dataX_temp[:, :, target_start2:]
+            dataX_second[:, :, target_start2:] = dataX_temp[:, :, target_start1:target_start1 + 2]
+
+            #for the catastrophe predictor 
+            target_start1, target_start2, = target_start1 - 1, target_start2 - 1
 
             #switch for dataZ
             dataZ_second[:, obj_start1:obj_start1 + 6] = dataZ_temp[:, obj_start2:obj_start2 + 6]

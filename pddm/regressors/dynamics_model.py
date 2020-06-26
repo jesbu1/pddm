@@ -62,7 +62,7 @@ class Dyn_Model:
         # of acs outside of range -1 to 1
         first, second = tf.split(self.inputs_, [(inputSize - self.acSize), self.acSize], 3)
         second = tf.clip_by_value(second, -1, 1)
-        self.inputs_clipped = tf.concat([first, second], axis=3)
+        self.inputs_clipped = tf.concat([first[..., :-1], second], axis=3)
 
         ## define forward pass
         self.define_forward_pass()

@@ -144,7 +144,7 @@ def check_dims(dataset_trainRand, env):
     assert dataset_trainRand.dataX.shape[0] == dataset_trainRand.dataY.shape[
         0] == dataset_trainRand.dataZ.shape[0]
 
-    #inp-ac = outp
+    #inp-ac = outp - catstrophe
     assert (inputSize - acSize) == outputSize
 
     print("\n\n######################\nDone getting data....")
