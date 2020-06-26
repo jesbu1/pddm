@@ -19,11 +19,11 @@ def cost_per_step(pt, prev_pt, costs, actions, dones, reward_func, catastrophe_p
     step_rews, step_dones = reward_func(pt[..., :-1], actions)
     if catastrophe_pred:
         collision = expit(pt[..., -1]) #sigmoids it
+        costs[collision > 0.5] = 10000
     
 
     dones = np.logical_or(dones, step_dones)
     costs[dones > 0] += 500
-    costs[collision > 0.5] = 10000
     costs[dones == 0] -= step_rews[dones == 0]
 
     return costs, dones
