@@ -172,28 +172,23 @@ class DataProcessor:
         if (self.duplicateData_switchObjs):
 
             obj_start1, obj_start2, target_start1, target_start2 = self.indices_for_switching
+            target_start1, target_start2, = target_start1 - 1, target_start2 - 1
 
             dataX_second = dataX.copy()
             dataX_temp = dataX.copy()
             dataZ_second = dataZ.copy()
             dataZ_temp = dataZ.copy()
-
             #switch for dataX
             dataX_second[:, :, obj_start1:obj_start1 + 6] = dataX_temp[:, :, obj_start2:obj_start2 + 6]
             dataX_second[:, :, obj_start2:obj_start2 + 6] = dataX_temp[:, :, obj_start1:obj_start1 + 6]
-            dataX_second[:, :, target_start1:target_start1 + 2] = dataX_temp[:, :, target_start2:]
-            dataX_second[:, :, target_start2:] = dataX_temp[:, :, target_start1:target_start1 + 2]
+            dataX_second[:, :, target_start1:target_start1 + 2] = dataX_temp[:, :, target_start2:-1]
+            dataX_second[:, :, target_start2:-1] = dataX_temp[:, :, target_start1:target_start1 + 2]
 
             #switch for dataZ
             dataZ_second[:, obj_start1:obj_start1 + 6] = dataZ_temp[:, obj_start2:obj_start2 + 6]
             dataZ_second[:, obj_start2:obj_start2 + 6] = dataZ_temp[:, obj_start1:obj_start1 + 6]
-            if self.catastrophe_pred:
-                target_start1, target_start2, = target_start1 - 1, target_start2 - 1
-                dataZ_second[:, target_start1:target_start1 + 2] = dataZ_temp[:, target_start2:-1]
-                dataZ_second[:, target_start2:-1] = dataZ_temp[:, target_start1:target_start1 + 2]
-            else:
-                dataZ_second[:, target_start1:target_start1 + 2] = dataZ_temp[:, target_start2:]
-                dataZ_second[:, target_start2:] = dataZ_temp[:, target_start1:target_start1 + 2]
+            dataZ_second[:, target_start1:target_start1 + 2] = dataZ_temp[:, target_start2:-1]
+            dataZ_second[:, target_start2:-1] = dataZ_temp[:, target_start1:target_start1 + 2]
 
             #concat
             dataX = np.concatenate([dataX, dataX_second])

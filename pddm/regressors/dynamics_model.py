@@ -52,8 +52,6 @@ class Dyn_Model:
         self.tf_datatype = self.params.tf_datatype
         self.catastrophe_pred = self.params.catastrophe_pred
 
-        if not self.catastrophe_pred:
-            self.outputSize -= 1
 
 
         ## create placeholders
@@ -99,7 +97,20 @@ class Dyn_Model:
             z = feedforward_network(
                 self.inputs_clipped[i], self.inputSize, self.outputSize,
                 self.params.num_fc_layers, self.params.depth_fc_layers, self.tf_datatype, scope=i)
-            out, catastrophe_prob = z[:, :self.outputSize - 1], z[:, self.outputSize - 1:]
+            if self.catastrophe_pred:
+                out, catastrophe_prob = z[:, :self.outputSize - 1], z[:, self.outputSize - 1:]
+                this_mse = tf.reduce_mean(
+                    tf.square(self.labels_[..., :-1] - out))
+                catastrophe_pred_loss = tf.losses.sigmoid_cross_entropy(
+                    self.labels_[..., -1:],
+                    catastrophe_prob,
+                )
+                loss = this_mse + catastrophe_pred_loss
+            else:
+                this_mse = tf.reduce_mean(
+                    tf.square(self.labels_[..., :-1] - z[..., :-1]))
+                loss = this_mse
+
             #out = mean + tf.random.normal(tf.shape(mean)) * tf.math.sqrt(tf.math.exp(logvar))
             self.curr_nn_outputs.append(z)
             #self.curr_nn_outputs.append(mean)
@@ -108,16 +119,9 @@ class Dyn_Model:
             #inv_var = tf.math.exp(-logvar)
             #true_loss = tf.reduce_mean(
             #    tf.square(self.labels_ - mean) * inv_var + logvar)
-            this_mse = tf.reduce_mean(
-                tf.square(self.labels_[..., :-1] - out))
-            catastrophe_pred_loss = tf.losses.sigmoid_cross_entropy(
-                self.labels_[..., -1:],
-                catastrophe_prob,
-            )
             #logvar_loss = 0.01 * (tf.reduce_sum(max_logvar) - tf.reduce_sum(min_logvar))
             #loss = true_loss + logvar_loss
             #loss = true_loss
-            loss = this_mse + catastrophe_pred_loss
             self.mses.append(loss)
 
             # this network's weights
