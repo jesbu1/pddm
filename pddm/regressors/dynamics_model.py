@@ -116,6 +116,7 @@ class Dyn_Model:
                 #loss = this_mse
 
             out = mean + tf.random.normal(tf.shape(mean)) * tf.math.sqrt(tf.math.exp(logvar))
+            out = tf.concat((out, catastrophe_prob), axis=-1)
             #self.curr_nn_outputs.append(z)
             self.curr_nn_outputs.append(out)
 
