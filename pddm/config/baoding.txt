@@ -82,7 +82,7 @@
 'nEpoch_init': [40],
 
 ## CARL
-'catastrophe_pred': [True],
+'catastrophe_pred': [False],
 'finetuning': [False],
 
 ##########################
