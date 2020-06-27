@@ -114,10 +114,10 @@ class MujocoEnv(gym.Env):
 
     # -----------------------------
 
-    def reset(self):  # compatibility with new gym
-        return self._reset()
+    def reset(self, mode="train"):  # compatibility with new gym
+        return self._reset(mode="train")
 
-    def _reset(self):
+    def _reset(self, mode="train"):
         self.sim.reset()
         self.sim.forward()
         ob = self.reset_model()
