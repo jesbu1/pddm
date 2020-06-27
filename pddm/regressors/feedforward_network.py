@@ -31,8 +31,8 @@ def feedforward_network(inputStates, inputSize, outputSize, num_fc_layers,
         initializer = tf.contrib.layers.xavier_initializer(
             uniform=False, seed=None, dtype=tf_datatype)
         fc = tf.contrib.layers.fully_connected
-        max_logvar = tf.Variable(np.ones([1, outputSize])/2., dtype=tf.float32, name="max_log_var")
-        min_logvar = tf.Variable(-np.ones([1, outputSize])*10., dtype=tf.float32, name="min_log_var")
+        max_logvar = tf.Variable(np.ones([1, outputSize])/2., trainable=True, dtype=tf.float32, name="max_log_var")
+        min_logvar = tf.Variable(-np.ones([1, outputSize])*10., trainable=True, dtype=tf.float32, name="min_log_var")
 
         # make hidden layers
         for i in range(num_fc_layers):
@@ -59,15 +59,16 @@ def feedforward_network(inputStates, inputSize, outputSize, num_fc_layers,
         # make output layer
         z = fc(
             h_i,
-            num_outputs=outputSize,
+            num_outputs=(outputSize - 1) * 2 + 1,
             activation_fn=None,
             weights_initializer=initializer,
             biases_initializer=initializer,
             reuse=reuse,
             trainable=True)
-        #mean, logvar = z[:, :outputSize], z[:, outputSize:]
+        half = (outputSize - 1)/2
+        mean, logvar, catastrophe_prob = z[:, :half], z[:, half:-1], z[:, -1:]
         #out, catastrophe_prob = z[:, :outputSize - 1], z[:, outputSize - 1:]
-        #logvar = max_logvar - tf.nn.softplus(max_logvar - logvar)
-        #logvar = min_logvar + tf.nn.softplus(logvar - min_logvar)
-    #return mean, logvar, max_logvar, min_logvar
-    return z #out, catastrophe_prob
+        logvar = max_logvar - tf.nn.softplus(max_logvar - logvar)
+        logvar = min_logvar + tf.nn.softplus(logvar - min_logvar)
+    return mean, logvar, max_logvar, min_logvar, catastrophe_prob
+    #return z #out, catastrophe_prob
