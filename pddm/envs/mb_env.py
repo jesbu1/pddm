@@ -26,7 +26,7 @@ class MBEnvWrapper:
         self.action_dim = self.unwrapped_env.action_space.shape[0]
 
 
-    def reset(self, reset_state=None, return_start_state=False):
+    def reset(self, reset_state=None, return_start_state=False, mode="train"):
 
         if reset_state:
             reset_pose = reset_state['reset_pose']
@@ -34,12 +34,12 @@ class MBEnvWrapper:
             reset_goal = reset_state['reset_goal']
 
             # reset to specified state
-            obs = self.unwrapped_env.do_reset(reset_pose, reset_vel, reset_goal)
+            obs = self.unwrapped_env.do_reset(reset_pose, reset_vel, reset_goal, mode=mode)
 
         else:
 
             # standard reset call
-            obs = self.unwrapped_env.reset_model()
+            obs = self.unwrapped_env.reset_model(mode=mode)
 
             #pose
             if hasattr(self.unwrapped_env, 'reset_pose'):

@@ -16,10 +16,14 @@ import os
 import numpy as np
 from gym import utils
 import enum
+from filelock import FileLock
+import xml.etree.ElementTree
+import mujoco_py
 
 from pddm.envs import mujoco_env
 from pddm.envs.robot import Robot
 from pddm.envs.utils.quatmath import euler2quat, quatDiff2Vel
+from pddm.envs.simulation.sim_robot import MujocoSimRobot, RenderMode
 
 ## Define the task enum
 class Task(enum.Enum):
@@ -58,9 +62,9 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         # xml file paths, based on task
         if self.which_task==Task.MOVE_TO_LOCATION:
-            xml_path = os.path.join(os.path.dirname(__file__), 'assets', 'shadowhand_baoding_1visible.xml')
+            self.xml_path = os.path.join(os.path.dirname(__file__), 'assets', 'shadowhand_baoding_1visible.xml')
         else:
-            xml_path = os.path.join(os.path.dirname(__file__), 'assets', 'shadowhand_baoding_2.xml')
+            self.xml_path = os.path.join(os.path.dirname(__file__), 'assets', 'shadowhand_baoding_2.xml')
 
             # init desired trajectory, for baoding
             self.x_radius = 0.02
@@ -86,7 +90,7 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.startup = True
         self.initializing = True
         super().__init__(
-            xml_path,
+            self.xml_path,
             frame_skip=frame_skip,
             camera_settings=dict(
                 distance=0.7,
@@ -126,7 +130,7 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         #ball weight
         self.domain_low = 0.025
         self.domain_high = 0.055
-        self.test_domain = 0.6
+        self.test_domain = 0.06
         self.xml_location1 = os.path.join(os.path.dirname(__file__), 'assets', 'baoding_ball_1.xml')
         self.xml_location2 = os.path.join(os.path.dirname(__file__), 'assets', 'baoding_ball_2.xml')
 
@@ -365,24 +369,33 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         return self.do_reset(self.reset_pose, self.reset_vel, self.reset_goal, mode=mode)
 
     def set_weight(self, weight):
-        lock = FileLock(self.xml_location + '.lock')  # concurrency protection
+        lock = FileLock(self.xml_path + '.lock')  # concurrency protection
+        def modify_ball_xml(ball_xml_file):
+            et = xml.etree.ElementTree.parse(ball_xml_file)
+            et.find('body').find('geom').set('mass', "%0.3f" % weight)  # changing ball weight
+            et.write(ball_xml_file)
         with lock:
-            et = xml.etree.ElementTree.parse(self.xml_location)
-            et.find('body').find('geom').set('mass', "%0.3f" % length)  # changing size of pole
-            et.write(self.xml_location)
-            self.model = mujoco_py.load_model_from_path(self.xml_location)
-        self.sim = mujoco_py.MjSim(self.model)
-        self.data = self.sim.data
+            modify_ball_xml(self.xml_location1)
+            modify_ball_xml(self.xml_location2)
+        self.sim_robot = MujocoSimRobot(
+            self.xml_path,
+            camera_settings=dict(
+                distance=0.7,
+                azimuth=-60,
+                elevation=-50,
+            ))
+        self.sim = self.sim_robot.sim
+        self.model = self.sim_robot.model
+        self.data = self.sim_robot.data
 
     def do_reset(self, reset_pose, reset_vel, reset_goal=None, mode="train"):
         if mode == 'train':
             self.ball_weights = np.random.uniform(self.domain_low, self.domain_high)
-            self.set_length(self.pendulum_length)
+            self.set_weight(self.ball_weights)
         elif self.mode != 'test' and mode == 'test': #starting adaptation
-            self.pendulum_length = self.test_domain
+            self.ball_weights = self.test_domain
             self.mode = mode
-            self.set_length(self.test_domain)
-        mujoco_env.MujocoEnv.reset(self)
+            self.set_weight(self.test_domain)
 
         #### reset counters
         self.counter=0

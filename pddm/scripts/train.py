@@ -348,7 +348,7 @@ def run_job(args, save_dir=None):
                           rollout_num)
 
                 #reset env randomly
-                starting_observation, starting_state = env.reset(return_start_state=True)
+                starting_observation, starting_state = env.reset(return_start_state=True, mode="train")
 
                 rollout_info = mpc_rollout.perform_rollout(
                     starting_state,
