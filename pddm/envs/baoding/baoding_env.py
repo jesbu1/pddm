@@ -377,13 +377,13 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         with lock:
             modify_ball_xml(self.xml_location1)
             modify_ball_xml(self.xml_location2)
-        self.sim_robot = MujocoSimRobot(
-            self.xml_path,
-            camera_settings=dict(
-                distance=0.7,
-                azimuth=-60,
-                elevation=-50,
-            ))
+            self.sim_robot = MujocoSimRobot(
+                self.xml_path,
+                camera_settings=dict(
+                    distance=0.7,
+                    azimuth=-60,
+                    elevation=-50,
+                ))
         self.sim = self.sim_robot.sim
         self.model = self.sim_robot.model
         self.data = self.sim_robot.data
