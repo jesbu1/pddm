@@ -123,6 +123,13 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             self.targetInfo_start1 = -4
             self.targetInfo_start2 = -2
 
+        #ball weight
+        self.domain_low = 0.025
+        self.domain_high = 0.055
+        self.test_domain = 0.6
+        self.xml_location1 = os.path.join(os.path.dirname(__file__), 'assets', 'baoding_ball_1.xml')
+        self.xml_location2 = os.path.join(os.path.dirname(__file__), 'assets', 'baoding_ball_2.xml')
+
     def get_reward(self, observations, actions):
 
         """get rewards of a given (observations, actions) pair
@@ -351,13 +358,31 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                         self.obs_dict['target2_pos'] #2
                         ])
 
-    def reset_model(self):
+    def reset_model(self, mode="train"):
         self.reset_pose = self.init_qpos.copy()
         self.reset_vel = self.init_qvel.copy()
         self.reset_goal = self.create_goal_trajectory()
-        return self.do_reset(self.reset_pose, self.reset_vel, self.reset_goal)
+        return self.do_reset(self.reset_pose, self.reset_vel, self.reset_goal, mode=mode)
 
-    def do_reset(self, reset_pose, reset_vel, reset_goal=None):
+    def set_weight(self, weight):
+        lock = FileLock(self.xml_location + '.lock')  # concurrency protection
+        with lock:
+            et = xml.etree.ElementTree.parse(self.xml_location)
+            et.find('body').find('geom').set('mass', "%0.3f" % length)  # changing size of pole
+            et.write(self.xml_location)
+            self.model = mujoco_py.load_model_from_path(self.xml_location)
+        self.sim = mujoco_py.MjSim(self.model)
+        self.data = self.sim.data
+
+    def do_reset(self, reset_pose, reset_vel, reset_goal=None, mode="train"):
+        if mode == 'train':
+            self.ball_weights = np.random.uniform(self.domain_low, self.domain_high)
+            self.set_length(self.pendulum_length)
+        elif self.mode != 'test' and mode == 'test': #starting adaptation
+            self.pendulum_length = self.test_domain
+            self.mode = mode
+            self.set_length(self.test_domain)
+        mujoco_env.MujocoEnv.reset(self)
 
         #### reset counters
         self.counter=0
@@ -372,6 +397,7 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
         #### reset hand and objects
         self.robot.reset(self, reset_pose, reset_vel)
+
         self.sim.forward()
         return np.concatenate((self._get_obs(), [0.]))
 
