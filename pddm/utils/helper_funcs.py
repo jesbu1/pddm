@@ -211,7 +211,12 @@ def collect_random_rollouts(env,
         env, random_policy, visualize, dt_from_xml, is_random=True, random_sampling_params=random_sampling_params)
 
     #collect rollouts
-    rollouts = c.collect_samples(num_rollouts, rollout_length)
+    if params.finetuning == True:
+        print("TEST MODE")
+        mode = "test"
+    else:
+        mode = "train"
+    rollouts = c.collect_samples(num_rollouts, rollout_length, mode=mode)
 
     #done
     print("Performed ", len(rollouts), " rollouts, each with ",
@@ -263,10 +268,11 @@ def visualize_rendering(rollout_info,
                         env,
                         args,
                         visualize=True,
-                        visualize_mpes=False):
+                        visualize_mpes=False,
+                        mode="train"):
 
     ### reset env to the starting state
-    curr_state = env.reset(reset_state=rollout_info['starting_state'])
+    curr_state = env.reset(reset_state=rollout_info['starting_state'], mode=mode)
 
     ### vars to specify here
     which_index_to_plot = 1

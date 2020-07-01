@@ -30,7 +30,7 @@ class CollectSamples(object):
         self.is_random = is_random
         self.random_sampling_params = random_sampling_params
 
-    def collect_samples(self, num_rollouts, steps_per_rollout):
+    def collect_samples(self, num_rollouts, steps_per_rollout, mode):
 
         #vars
         all_processes = []
@@ -42,7 +42,7 @@ class CollectSamples(object):
         for rollout_number in range(num_rollouts):
             result = pool.apply_async(
                 self.do_rollout,
-                args=(steps_per_rollout, rollout_number, visualization_frequency),
+                args=(steps_per_rollout, rollout_number, visualization_frequency, mode),
                 callback=self.mycallback)
 
         pool.close()  #not going to add anything else to the pool
@@ -53,7 +53,7 @@ class CollectSamples(object):
     def mycallback(self, x):
         self.rollouts.append(x)
 
-    def do_rollout(self, steps_per_rollout, rollout_number, visualization_frequency):
+    def do_rollout(self, steps_per_rollout, rollout_number, visualization_frequency, mode):
 
         #init vars
         observations = []
@@ -61,7 +61,7 @@ class CollectSamples(object):
         rewards_per_step = []
 
         #reset env
-        observation, starting_state = self.env.reset(return_start_state=True)
+        observation, starting_state = self.env.reset(return_start_state=True, mode=mode)
 
         prev_action = None
         for step_num in range(steps_per_rollout):

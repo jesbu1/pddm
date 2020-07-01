@@ -32,13 +32,13 @@ class CollectSamples(object):
         self.is_random = is_random
         self.random_sampling_params = random_sampling_params
 
-    def collect_samples(self, num_rollouts, steps_per_rollout):
+    def collect_samples(self, num_rollouts, steps_per_rollout, mode):
 
         visualization_frequency = 1
         rollouts = []
         for rollout_number in range(num_rollouts):
 
-            observation, starting_state = self.env.reset(return_start_state=True)
+            observation, starting_state = self.env.reset(return_start_state=True, mode=mode)
 
             rollout = self.perform_rollout(
                 observation, steps_per_rollout, rollout_number,

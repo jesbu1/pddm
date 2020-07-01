@@ -86,6 +86,7 @@ def convert_to_parser_args(args_source=sys.argv[1:]):
     # CARL Modification
     parser.add_argument('--catastrophe_pred', action="store_true")
     parser.add_argument('--finetuning', action="store_true")
+    parser.add_argument('--test_domain', type=float, default=0.07)
 
     #######################
     ### controller

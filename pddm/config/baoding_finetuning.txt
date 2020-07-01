@@ -1,0 +1,108 @@
+# Copyright 2019 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+{
+
+#########################
+##### run options
+#########################
+
+'job_name': ['baoding'],
+'seed': [70],
+
+#########################
+##### experiment options
+#########################
+
+## env
+'env_name': ['pddm_baoding-v0'],
+'rollout_length': [100],
+'num_iters': [1],
+'num_trajectories_per_iter': [1],
+
+## continue
+'continue_run': [150],
+'continue_run_filepath': ['/home/jesse/pddm/pddm/output_cat_pred_0.015_0.065_no_prob_1/baoding'],
+
+## some T/F options
+'use_ground_truth_dynamics': [False],
+'visualize_MPC_rollout': [False],
+'print_minimal': [False],
+
+## noise
+'make_aggregated_dataset_noisy': [False],
+'make_training_dataset_noisy': [False],
+'rollouts_noise_actions': [False],
+'rollouts_document_noised_actions': [False],
+
+##########################
+##### rand data collection
+##########################
+
+## collect random rollouts
+'load_existing_random_data': [False],
+'num_rand_rollouts_train': [100],
+'num_rand_rollouts_val': [50],
+'rand_rollout_length': [30],
+'use_threading': [False],
+
+## sample random velocities vs. positions
+'rand_policy_sample_velocities': [True],
+'rand_policy_vel_min': [0.05],
+'rand_policy_vel_max': [0.15],
+'rand_policy_hold_action': [2],
+
+##########################
+##### dynamics model
+##########################
+
+## arch
+'num_fc_layers': [2],
+'depth_fc_layers': [500],
+'ensemble_size': [3],
+'K': [1],
+
+## model training
+'warmstart_training': [False],
+'always_use_savedModel': [True],
+'batchsize': [512],
+'lr': [0.001],
+'nEpoch': [40],
+'nEpoch_init': [40],
+
+## CARL
+'catastrophe_pred': [False, True],
+'finetuning': [True],
+'test_domain': [0.1, 0.2, 0.3, 0.4, 0.5, 1.0],
+
+##########################
+##### controller
+##########################
+
+## MPC
+'horizon': [7],
+'num_control_samples': [700],
+'controller_type': ['mppi'],
+'traj_sampling_ratio': [1],
+
+## cem
+'cem_max_iters': [3],
+'cem_num_elites': [20],
+
+## mppi
+'mppi_kappa': [20],
+'mppi_mag_noise': [0.9],
+'mppi_beta': [0.7],
+
+}

@@ -128,11 +128,12 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             self.targetInfo_start2 = -2
 
         #ball weight
-        self.domain_low = 0.025
-        self.domain_high = 0.055
-        self.test_domain = 0.06
+        self.domain_low = 0.015
+        self.domain_high = 0.065
+        self.test_domain = 0.07
         self.xml_location1 = os.path.join(os.path.dirname(__file__), 'assets', 'baoding_ball_1.xml')
         self.xml_location2 = os.path.join(os.path.dirname(__file__), 'assets', 'baoding_ball_2.xml')
+        self.mode = 'train'
 
     def get_reward(self, observations, actions):
 
@@ -387,6 +388,10 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.sim = self.sim_robot.sim
         self.model = self.sim_robot.model
         self.data = self.sim_robot.data
+        if self.sim_robot.renderer._onscreen_renderer:
+            import pdb; pdb.set_trace()
+            self.close()
+            self.render()
 
     def do_reset(self, reset_pose, reset_vel, reset_goal=None, mode="train"):
         if mode == 'train':
