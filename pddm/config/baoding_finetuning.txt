@@ -28,12 +28,12 @@
 ## env
 'env_name': ['pddm_baoding-v0'],
 'rollout_length': [100],
-'num_iters': [1],
-'num_trajectories_per_iter': [1],
+'num_iters': [20],
+'num_trajectories_per_iter': [30],
 
 ## continue
 'continue_run': [150],
-'continue_run_filepath': ['/home/jesse/pddm/pddm/output_cat_pred_0.015_0.065_no_prob_1/baoding'],
+'continue_run_filepath': ['/nfs/kun1/users/jesbu1/pddm/pddm/output_cat_pred_0.015_0.065_no_prob_1/baoding'],
 
 ## some T/F options
 'use_ground_truth_dynamics': [False],
@@ -75,7 +75,7 @@
 
 ## model training
 'warmstart_training': [False],
-'always_use_savedModel': [True],
+'always_use_savedModel': [False],
 'batchsize': [512],
 'lr': [0.001],
 'nEpoch': [40],
