@@ -15,11 +15,11 @@
 import numpy as np
 from scipy.special import expit
 
-def cost_per_step(pt, prev_pt, costs, actions, dones, reward_func, catastrophe_pred):
+def cost_per_step(pt, prev_pt, costs, actions, dones, reward_func, catastrophe_pred, beta):
     step_rews, step_dones = reward_func(pt[..., :-1], actions)
     if catastrophe_pred:
         collision = expit(pt[..., -1]) #sigmoids it
-        costs[collision > 0.5] = 10000
+        costs[collision > beta] = 10000
     
 
     dones = np.logical_or(dones, step_dones)
@@ -30,7 +30,7 @@ def cost_per_step(pt, prev_pt, costs, actions, dones, reward_func, catastrophe_p
 
 
 def calculate_costs(resulting_states_list, actions, reward_func,
-                    evaluating, take_exploratory_actions, traj_sampling_ratio, catastrophe_pred):
+                    evaluating, take_exploratory_actions, traj_sampling_ratio, catastrophe_pred, beta):
     """Rank various predicted trajectories (by cost)
 
     Args:
@@ -89,7 +89,7 @@ def calculate_costs(resulting_states_list, actions, reward_func,
         pt = resulting_states[pt_number + 1]
         #update cost at the next timestep of the H-step rollout
         actions_per_step = tiled_actions[:, pt_number]
-        costs, dones = cost_per_step(pt, prev_pt, costs, actions_per_step, dones, reward_func, catastrophe_pred)
+        costs, dones = cost_per_step(pt, prev_pt, costs, actions_per_step, dones, reward_func, catastrophe_pred, beta)
         #update
         prev_pt = np.copy(pt)
 
