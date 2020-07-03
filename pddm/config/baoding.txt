@@ -28,7 +28,7 @@
 ## env
 'env_name': ['pddm_baoding-v0'],
 'rollout_length': [100],
-'num_iters': [250],
+'num_iters': [100],
 'num_trajectories_per_iter': [30],
 
 ## continue
@@ -55,7 +55,7 @@
 'num_rand_rollouts_train': [100],
 'num_rand_rollouts_val': [50],
 'rand_rollout_length': [30],
-'use_threading': [True],
+'use_threading': [False],
 
 ## sample random velocities vs. positions
 'rand_policy_sample_velocities': [True],
@@ -84,6 +84,8 @@
 ## CARL
 'catastrophe_pred': [True],
 'finetuning': [False],
+'fixed_variance_sampling': [True],
+'traj_sampling_ratio': [4],
 
 ##########################
 ##### controller
@@ -93,7 +95,6 @@
 'horizon': [7],
 'num_control_samples': [700],
 'controller_type': ['mppi'],
-'traj_sampling_ratio': [1],
 
 ## cem
 'cem_max_iters': [3],

@@ -88,6 +88,7 @@ def convert_to_parser_args(args_source=sys.argv[1:]):
     parser.add_argument('--finetuning', action="store_true")
     parser.add_argument('--test_domain', type=float, default=0.07)
     parser.add_argument('--beta', default=0.5, type=float)
+    parser.add_argument('--fixed_variance_sampling', action="store_true")
 
     #######################
     ### controller

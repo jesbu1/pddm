@@ -111,7 +111,7 @@ def calculate_costs(resulting_states_list, actions, reward_func,
     new_costs = np.array(new_costs)
     ######### Trajectory sampling aggregation
     new_costs = np.reshape(new_costs, (int(N//traj_sampling_ratio), -1))
-
+    
     #mean and std cost (across ensemble) [N,]
     mean_cost = np.mean(new_costs, 1)
     std_cost = np.std(new_costs, 1)
