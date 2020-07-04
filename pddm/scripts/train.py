@@ -757,8 +757,6 @@ def main():
 
         #directory name for this experiment
         job['output_dir'] = os.path.join(output_dir, job['job_name'])
-        if args.finetuning:
-            job['output_dir'] = job['output_dir'] + "%0.2f" % args.test_domain
 
         ################
         ### run job

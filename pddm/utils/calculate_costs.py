@@ -117,33 +117,31 @@ def calculate_costs(resulting_states_list, actions, reward_func,
     std_cost = np.std(new_costs, 1)
 
     #####################################################################################################    
-    # TODO: Change these temp vars
-    #no_catastrophe_pred = True
-    #percentile = 50
-    #if no_catastrophe_pred:
-    #    new_costs = np.array(new_costs)
-    #    # Discounted reward sum calculation for CARL (Reward). At percentile == 100, this is normal PDDM
-    #    if percentile <= 100:
-    #        k = max(int((percentile/100) * new_costs.shape[1]), 1)
-    #        k_percentile = -np.partition(-new_costs, kth=k, axis=1)[k]
-    #        cost_mask = costs < k_percentile
-    #    else:
-    #        k = max(int(((200 - percentile)/100) * new_costs.shape[1]), 1)
-    #        k_percentile = np.partition(new_costs, kth=k, axis=1)[k]
-    #        cost_mask = costs > k_percentile
-    #    # TODO: Continue from here
-    #    new_costs[cost_mask] = 0
-    #    discounted_sum = np.sum(new_costs, axis=1)
-    #    new_costs[cost_mask] = float('nan')
-    #    lengths = np.sum(~np.isnan(new_costs), dim=1)
-    #    mean_cost = discounted_sum / lengths
-    #    # if invalid trajectory, then make the cost the mean so they cancel out in SD calculation
-    #    costs = np.where(cost_mask, mean_cost, new_costs) 
-    #    std_cost = np.sum((new_costs - mean_cost)**2, axis=1) / lengths
-
-    #else:
-    #    mean_cost = np.mean(new_costs, 1)
-    #    std_cost = np.std(new_costs, 1)
+    """
+    if no_catastrophe_pred:
+        new_costs = np.array(new_costs)
+        # Discounted reward sum calculation for CARL (Reward). At percentile == 100, this is normal PDDM
+        if beta <= 100:
+            k = max(int((beta) * new_costs.shape[1]), 1)
+            k_percentile = -np.partition(-new_costs, kth=k, axis=1)[k]
+            cost_mask = costs < k_percentile
+        else:
+            k = max(int(((200 - beta)/100) * new_costs.shape[1]), 1)
+            k_percentile = np.partition(new_costs, kth=k, axis=1)[k]
+            cost_mask = costs > k_percentile
+        # TODO: Continue from here
+        new_costs[cost_mask] = 0
+        discounted_sum = np.sum(new_costs, axis=1)
+        new_costs[cost_mask] = float('nan')
+        lengths = np.sum(~np.isnan(new_costs), dim=1)
+        mean_cost = discounted_sum / lengths
+        # if invalid trajectory, then make the cost the mean so they cancel out in SD calculation
+        costs = np.where(cost_mask, mean_cost, new_costs) 
+        std_cost = np.sum((new_costs - mean_cost)**2, axis=1) / lengths
+    else:
+        mean_cost = np.mean(new_costs, 1)
+        std_cost = np.std(new_costs, 1)
+    """
     #####################################################################################################    
 
     #rank by rewards

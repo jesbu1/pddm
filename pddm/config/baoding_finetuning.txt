@@ -28,12 +28,18 @@
 ## env
 'env_name': ['pddm_baoding-v0'],
 'rollout_length': [100],
-'num_iters': [25],
+'num_iters': [15],
 'num_trajectories_per_iter': [30],
 
 ## continue
 'continue_run': [101],
-'continue_run_filepath': ['/nfs/kun1/users/jesbu1/pddm/pddm/output_cat_pred_0.015_0.065_no_prob_1/baoding'],
+'continue_run_filepath': [
+    '/nfs/kun1/users/jesbu1/pddm/pddm/output_cat_pred_0.015_0.065_no_prob_1/baoding',
+    '/nfs/kun1/users/jesbu1/pddm/pddm/output_cat_pred_0.015_0.065_no_prob_2/baoding',
+    '/nfs/kun1/users/jesbu1/pddm/pddm/output_cat_pred_0.015_0.065_no_prob_3/baoding',
+    '/nfs/kun1/users/jesbu1/pddm/pddm/output_cat_pred_0.015_0.065_no_prob_4/baoding',
+    '/nfs/kun1/users/jesbu1/pddm/pddm/output_cat_pred_0.015_0.065_no_prob_5/baoding'
+    ],
 
 ## some T/F options
 'use_ground_truth_dynamics': [False],
@@ -82,10 +88,24 @@
 'nEpoch_init': [40],
 
 ## CARL
-'catastrophe_pred': [True],
+'catastrophe_pred': [
+    True,
+    #True,
+    #False,
+    #False,
+    #True,
+    ],
 'finetuning': [True],
-'test_domain': [0.1, 0.2, 0.3, 0.4, 0.5, 1.0],
-'beta': [0.33],
+'test_domain': [0.04, 0.1, 0.15, 0.2, 0.25, 0.3],
+'beta': [0.25],
+'fixed_variance_sampling': [
+    False,
+    #True,
+    #False,
+    #True,
+    #False,
+    ],
+'traj_sampling_ratio': [4],
 
 ##########################
 ##### controller
