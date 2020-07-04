@@ -89,22 +89,26 @@
 
 ## CARL
 'catastrophe_pred': [
+    #True,
+    #True,
+    #False,
+    #False,
     True,
-    #True,
-    #False,
-    #False,
-    #True,
     ],
 'finetuning': [True],
 'test_domain': [0.04, 0.1, 0.15, 0.2, 0.25, 0.3],
-'beta': [0.25],
+'beta': [0.5],
 'fixed_variance_sampling': [
+    #False,
+    #True,
+    #False,
+    #True,
     False,
-    #True,
-    #False,
-    #True,
-    #False,
     ],
+'risk_aversion_type': [
+    #"state",
+    "reward",
+],
 'traj_sampling_ratio': [4],
 
 ##########################

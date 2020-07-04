@@ -114,7 +114,7 @@ class Dyn_Model:
                 loss = this_mse
 
             if self.fixed_variance_sampling:
-                distribution_pred = out + tf.random.normal(tf.shape(out), stddev=0.5)
+                distribution_pred = out + tf.random.normal(tf.shape(out), stddev=0.1)
                 z = tf.concat((distribution_pred, catastrophe_prob), axis=-1)
 
             self.curr_nn_outputs.append(z)

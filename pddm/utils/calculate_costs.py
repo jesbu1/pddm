@@ -15,9 +15,9 @@
 import numpy as np
 from scipy.special import expit
 
-def cost_per_step(pt, prev_pt, costs, actions, dones, reward_func, catastrophe_pred, beta):
+def cost_per_step(pt, prev_pt, costs, actions, dones, reward_func, catastrophe_pred, risk_aversion_type, beta):
     step_rews, step_dones = reward_func(pt[..., :-1], actions)
-    if catastrophe_pred:
+    if catastrophe_pred and risk_aversion_type == "state":
         collision = expit(pt[..., -1]) #sigmoids it
         costs[collision > beta] = 10000
     
@@ -30,7 +30,7 @@ def cost_per_step(pt, prev_pt, costs, actions, dones, reward_func, catastrophe_p
 
 
 def calculate_costs(resulting_states_list, actions, reward_func,
-                    evaluating, take_exploratory_actions, traj_sampling_ratio, catastrophe_pred, beta):
+                    evaluating, take_exploratory_actions, traj_sampling_ratio, catastrophe_pred, risk_aversion_type, beta):
     """Rank various predicted trajectories (by cost)
 
     Args:
@@ -89,7 +89,7 @@ def calculate_costs(resulting_states_list, actions, reward_func,
         pt = resulting_states[pt_number + 1]
         #update cost at the next timestep of the H-step rollout
         actions_per_step = tiled_actions[:, pt_number]
-        costs, dones = cost_per_step(pt, prev_pt, costs, actions_per_step, dones, reward_func, catastrophe_pred, beta)
+        costs, dones = cost_per_step(pt, prev_pt, costs, actions_per_step, dones, reward_func, catastrophe_pred, risk_aversion_type, beta)
         #update
         prev_pt = np.copy(pt)
 
@@ -111,37 +111,26 @@ def calculate_costs(resulting_states_list, actions, reward_func,
     new_costs = np.array(new_costs)
     ######### Trajectory sampling aggregation
     new_costs = np.reshape(new_costs, (int(N//traj_sampling_ratio), -1))
-    
-    #mean and std cost (across ensemble) [N,]
-    mean_cost = np.mean(new_costs, 1)
-    std_cost = np.std(new_costs, 1)
-
     #####################################################################################################    
-    """
-    if no_catastrophe_pred:
+    if catastrophe_pred and risk_aversion_type == "reward":
         new_costs = np.array(new_costs)
         # Discounted reward sum calculation for CARL (Reward). At percentile == 100, this is normal PDDM
-        if beta <= 100:
-            k = max(int((beta) * new_costs.shape[1]), 1)
-            k_percentile = -np.partition(-new_costs, kth=k, axis=1)[k]
-            cost_mask = costs < k_percentile
-        else:
-            k = max(int(((200 - beta)/100) * new_costs.shape[1]), 1)
-            k_percentile = np.partition(new_costs, kth=k, axis=1)[k]
-            cost_mask = costs > k_percentile
+        if beta <= 1:
+            k_percentile = np.expand_dims(-np.percentile(-new_costs, q=beta * 100, axis=1, interpolation="nearest"), 1)
+            cost_mask = new_costs < k_percentile
         # TODO: Continue from here
         new_costs[cost_mask] = 0
         discounted_sum = np.sum(new_costs, axis=1)
         new_costs[cost_mask] = float('nan')
-        lengths = np.sum(~np.isnan(new_costs), dim=1)
+        lengths = np.sum(~np.isnan(new_costs), axis=1)
         mean_cost = discounted_sum / lengths
         # if invalid trajectory, then make the cost the mean so they cancel out in SD calculation
-        costs = np.where(cost_mask, mean_cost, new_costs) 
-        std_cost = np.sum((new_costs - mean_cost)**2, axis=1) / lengths
+        mean_cost_repeated = np.repeat(np.expand_dims(mean_cost, 1), new_costs.shape[1], -1)
+        new_costs = np.where(cost_mask, mean_cost_repeated, new_costs) 
+        std_cost = np.sqrt(np.sum((new_costs - mean_cost_repeated)**2, axis=1) / lengths)
     else:
         mean_cost = np.mean(new_costs, 1)
         std_cost = np.std(new_costs, 1)
-    """
     #####################################################################################################    
 
     #rank by rewards
