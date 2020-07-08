@@ -37,7 +37,7 @@
 
 ## some T/F options
 'use_ground_truth_dynamics': [False],
-'visualize_MPC_rollout': [True],
+'visualize_MPC_rollout': [False],
 'print_minimal': [False],
 
 ## noise
