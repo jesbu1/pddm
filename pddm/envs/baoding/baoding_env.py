@@ -128,8 +128,8 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             self.targetInfo_start2 = -2
 
         #ball weight
-        self.domain_low = 0.015
-        self.domain_high = 0.065
+        self.domain_low = 0.026
+        self.domain_high = 0.027
         self.test_domain = 0.07
         self.xml_location1 = os.path.join(os.path.dirname(__file__), 'assets', 'baoding_ball_1.xml')
         self.xml_location2 = os.path.join(os.path.dirname(__file__), 'assets', 'baoding_ball_2.xml')
@@ -369,6 +369,30 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.reset_goal = self.create_goal_trajectory()
         return self.do_reset(self.reset_pose, self.reset_vel, self.reset_goal, mode=mode)
 
+    def set_size(self, weight):
+        lock = FileLock(self.xml_path + '.lock')  # concurrency protection
+        def modify_ball_xml(ball_xml_file):
+            et = xml.etree.ElementTree.parse(ball_xml_file)
+            et.find('body').find('geom').set('size', "%0.3f" % weight)  # changing ball weight
+            et.write(ball_xml_file)
+        with lock:
+            modify_ball_xml(self.xml_location1)
+            modify_ball_xml(self.xml_location2)
+            self.sim_robot = MujocoSimRobot(
+                self.xml_path,
+                camera_settings=dict(
+                    distance=0.7,
+                    azimuth=-60,
+                    elevation=-50,
+                ))
+        self.sim = self.sim_robot.sim
+        self.model = self.sim_robot.model
+        self.data = self.sim_robot.data
+        if self.sim_robot.renderer._onscreen_renderer:
+            import ipdb; ipdb.set_trace()
+            self.close()
+            self.render()
+
     def set_weight(self, weight):
         lock = FileLock(self.xml_path + '.lock')  # concurrency protection
         def modify_ball_xml(ball_xml_file):
@@ -389,18 +413,21 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.model = self.sim_robot.model
         self.data = self.sim_robot.data
         if self.sim_robot.renderer._onscreen_renderer:
-            import pdb; pdb.set_trace()
+            import ipdb; ipdb.set_trace()
             self.close()
             self.render()
 
     def do_reset(self, reset_pose, reset_vel, reset_goal=None, mode="train"):
         if mode == 'train':
-            self.ball_weights = np.random.uniform(self.domain_low, self.domain_high)
-            self.set_weight(self.ball_weights)
+            #self.ball_weights = np.random.uniform(self.domain_low, self.domain_high)
+            self.ball_weights = 0.027
+            #self.set_weight(self.ball_weights)
+            self.set_size(self.ball_weights)
         elif self.mode != 'test' and mode == 'test': #starting adaptation
             self.ball_weights = self.test_domain
             self.mode = mode
-            self.set_weight(self.test_domain)
+            #self.set_weight(self.test_domain)
+            self.set_size(self.test_domain)
 
         #### reset counters
         self.counter=0

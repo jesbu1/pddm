@@ -37,7 +37,7 @@
 
 ## some T/F options
 'use_ground_truth_dynamics': [False],
-'visualize_MPC_rollout': [False],
+'visualize_MPC_rollout': [True],
 'print_minimal': [False],
 
 ## noise
@@ -69,8 +69,8 @@
 
 ## arch
 'num_fc_layers': [2],
-'depth_fc_layers': [500],
-'ensemble_size': [3],
+'depth_fc_layers': [300],
+'ensemble_size': [5],
 'K': [1],
 
 ## model training
@@ -84,8 +84,12 @@
 ## CARL
 'catastrophe_pred': [True],
 'finetuning': [False],
-'fixed_variance_sampling': [True],
-'traj_sampling_ratio': [4],
+'fixed_variance_sampling': [False],
+'risk_aversion_type': [
+    "state",
+    #"reward",
+],
+'traj_sampling_ratio': [1],
 
 ##########################
 ##### controller
