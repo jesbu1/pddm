@@ -373,7 +373,7 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         lock = FileLock(self.xml_path + '.lock')  # concurrency protection
         def modify_ball_xml(ball_xml_file):
             et = xml.etree.ElementTree.parse(ball_xml_file)
-            et.find('body').find('geom').set('size', "%0.3f" % weight)  # changing ball weight
+            et.find('body').find('geom').set('size', "%0.4f" % weight)  # changing ball weight
             et.write(ball_xml_file)
         with lock:
             modify_ball_xml(self.xml_location1)
