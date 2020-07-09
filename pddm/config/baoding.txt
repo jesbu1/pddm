@@ -28,7 +28,7 @@
 ## env
 'env_name': ['pddm_baoding-v0'],
 'rollout_length': [100],
-'num_iters': [120],
+'num_iters': [101],
 'num_trajectories_per_iter': [30],
 
 ## continue
@@ -41,8 +41,8 @@
 'print_minimal': [False],
 
 ## noise
-'make_aggregated_dataset_noisy': [False],#[True],
-'make_training_dataset_noisy': [False],#[True],
+'make_aggregated_dataset_noisy': [True],
+'make_training_dataset_noisy': [True],
 'rollouts_noise_actions': [False],
 'rollouts_document_noised_actions': [False],
 
@@ -97,7 +97,7 @@
 
 ## MPC
 'horizon': [7],
-'num_control_samples': [700],
+'num_control_samples': [1500],
 'controller_type': ['mppi'],
 
 ## cem
@@ -107,6 +107,6 @@
 ## mppi
 'mppi_kappa': [20],
 'mppi_mag_noise': [0.9],
-'mppi_beta': [0.7],
+'mppi_beta': [0.6],
 
 }

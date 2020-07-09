@@ -128,7 +128,7 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             self.targetInfo_start2 = -2
 
         #ball weight
-        self.domain_low = 0.026
+        self.domain_low = 0.0265
         self.domain_high = 0.027
         self.test_domain = 0.07
         self.xml_location1 = os.path.join(os.path.dirname(__file__), 'assets', 'baoding_ball_1.xml')
@@ -419,8 +419,7 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def do_reset(self, reset_pose, reset_vel, reset_goal=None, mode="train"):
         if mode == 'train':
-            #self.ball_weights = np.random.uniform(self.domain_low, self.domain_high)
-            self.ball_weights = 0.027
+            self.ball_weights = np.random.uniform(self.domain_low, self.domain_high)
             #self.set_weight(self.ball_weights)
             self.set_size(self.ball_weights)
         elif self.mode != 'test' and mode == 'test': #starting adaptation
