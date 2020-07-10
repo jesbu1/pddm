@@ -29,22 +29,26 @@
 'env_name': ['pddm_baoding-v0'],
 'rollout_length': [100],
 'num_iters': [15],
-'num_trajectories_per_iter': [5],
+'num_trajectories_per_iter': [30],
 
 ## continue
 'continue_run': [101],
 'continue_run_filepath': [
-    '/home/jesse/output_cat_pred_0.015_0.065_no_prob_1/baoding',
+    '/nfs/kun1/users/jesbu1/pddm/pddm/output_cat_pred_0.01_mass_size_0.026_0.027_1/baoding',
+    '/nfs/kun1/users/jesbu1/pddm/pddm/output_cat_pred_0.01_mass_size_0.026_0.027_2/baoding',
+    '/nfs/kun1/users/jesbu1/pddm/pddm/output_cat_pred_0.01_mass_size_0.026_0.027_3/baoding',
+    '/nfs/kun1/users/jesbu1/pddm/pddm/output_cat_pred_0.01_mass_size_0.026_0.027_4/baoding',
+    '/nfs/kun1/users/jesbu1/pddm/pddm/output_cat_pred_0.01_mass_size_0.026_0.027_5/baoding',
     ],
 
 ## some T/F options
 'use_ground_truth_dynamics': [False],
-'visualize_MPC_rollout': [True],
+'visualize_MPC_rollout': [False],
 'print_minimal': [False],
 
 ## noise
-'make_aggregated_dataset_noisy': [False],
-'make_training_dataset_noisy': [False],
+'make_aggregated_dataset_noisy': [True],
+'make_training_dataset_noisy': [True],
 'rollouts_noise_actions': [False],
 'rollouts_document_noised_actions': [False],
 
@@ -71,13 +75,13 @@
 
 ## arch
 'num_fc_layers': [2],
-'depth_fc_layers': [500],
-'ensemble_size': [3],
+'depth_fc_layers': [300],
+'ensemble_size': [5],
 'K': [1],
 
 ## model training
 'warmstart_training': [False],
-'always_use_savedModel': [True],
+'always_use_savedModel': [False],
 'batchsize': [512],
 'lr': [0.001],
 'nEpoch': [40],
@@ -87,22 +91,16 @@
 'catastrophe_pred': [
     True,
     #True,
-    False,
+    #False,
     #False,
     #True,
     #True
     ],
 'finetuning': [True],
-'test_domain': [0.05, 0.15, 0.25, 0.35, 0.45, 0.55],
+'test_domain': [0.0255, 0.0265, 0.0275, 0.028, 0.0285, 0.029],
 'beta': [0.75],
 'fixed_variance_sampling': [
     False,
-    #True,
-    False,
-    #True,
-    #True,
-    #True,
-    #True,
     ],
 'risk_aversion_type': [
     "state",
@@ -110,11 +108,6 @@
 ],
 'traj_sampling_ratio': [
     1,
-    #4,
-    #1,
-    #4,
-    #4,
-    #1
     ],
 
 ##########################
