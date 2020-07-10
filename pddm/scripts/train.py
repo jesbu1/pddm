@@ -724,6 +724,7 @@ def main():
 
     parser.add_argument('--use_gpu', action="store_true")
     parser.add_argument('-frac', '--gpu_frac', type=float, default=0.9)
+    parser.add_argument('--second_half', action="store_true")
     general_args = parser.parse_args()
 
     #####################
@@ -761,10 +762,14 @@ def main():
 
         #directory name for this experiment
         job['output_dir'] = os.path.join(output_dir, job['job_name'])
-
-        if index >= 15:
-            print(job['output_dir'])
-            continue
+        if general_args.second_half:
+            if index >= 15:
+                print(job['output_dir'])
+                continue
+        else:
+            if index < 15:
+                print(job['output_dir'])
+                continue
 
         ################
         ### run job

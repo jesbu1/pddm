@@ -1,6 +1,6 @@
 <mujocoinclude>
     <body name="ball2" pos="0.031 -0.03 0.24">
         <freejoint />
-        <geom condim="4" group="0" mass="0.01" material="MatBallP" size="0.0267" type="sphere" />
+        <geom condim="4" group="0" mass="0.01" material="MatBallP" size="0.02550" type="sphere" />
     </body>
  </mujocoinclude>

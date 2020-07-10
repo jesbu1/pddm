@@ -90,15 +90,12 @@
 ## CARL
 'catastrophe_pred': [
     True,
-    #True,
     #False,
-    #False,
-    #True,
     #True
     ],
 'finetuning': [True],
 'test_domain': [0.0255, 0.0265, 0.0275, 0.028, 0.0285, 0.029],
-'beta': [0.75],
+'beta': [0.25],
 'fixed_variance_sampling': [
     False,
     ],
