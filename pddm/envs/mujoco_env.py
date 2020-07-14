@@ -63,7 +63,6 @@ class MujocoEnv(gym.Env):
             'render.modes': ['human', 'rgb_array', 'depth_array'],
             'video.frames_per_second': int(np.round(1.0 / self.dt))
         }
-        print(self.dt)
         self.mujoco_render_frames = False
 
         self.init_qpos = self.data.qpos.ravel().copy()
