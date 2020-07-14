@@ -15,6 +15,7 @@
 import numpy as np
 import copy
 import matplotlib.pyplot as plt
+from scipy.special import expit
 
 # my imports
 from pddm.samplers import trajectory_sampler
@@ -56,6 +57,15 @@ class MPPI(object):
         self.beta = params.mppi_beta
         self.mppi_mean = np.zeros((self.horizon, self.ac_dim))  #start mean at 0
 
+
+        #############
+        ## Debugging
+        #############
+        self.observation_history = []
+        self.positive_prediction_correct = [[] for _ in range(self.horizon)]
+        self.negative_prediction_correct = [[] for _ in range(self.horizon)]
+        self.total_prediction_correct = [[] for _ in range(self.horizon)]
+
     ###################################################################
     ###################################################################
     #### update action mean using weighted average of the actions (by their resulting scores)
@@ -82,11 +92,22 @@ class MPPI(object):
         ##########################
         return self.mppi_mean[0]
 
+    def clear_debugging_vars(self):
+        self.observation_history = []
+        self.prediction_correct = [[] for _ in range(self.horizon)]
+        self.negative_prediction_correct = [[] for _ in range(self.horizon)]
+        self.total_prediction_correct = [[] for _ in range(self.horizon)]
+
     def get_action(self, step_number, curr_state_K, actions_taken_so_far,
                    starting_fullenvstate, evaluating, take_exploratory_actions):
 
         # init vars
         curr_state_K = np.array(curr_state_K)  #[K, sa_dim]
+
+        ## Debugging
+        self.observation_history.append(curr_state_K[0])
+        if len(self.observation_history) > self.horizon:
+            self.observation_history.pop(0)
 
         # remove the 1st entry of mean (mean from past timestep, that was just executed)
         # and copy last entry (starting point, for the next timestep)
@@ -183,6 +204,23 @@ class MPPI(object):
         # uses all paths to update action mean (for horizon steps)
         # Note: mppi_update needs rewards, so pass in -costs
         selected_action = self.mppi_update(-costs, -mean_costs, std_costs, all_samples)
+
+        # debugging catastrophe prediction
+        selected_acs = np.expand_dims(np.expand_dims(self.mppi_mean, 0), 2)
+        resulting_final_actions_states_list = self.dyn_models.do_forward_sim(
+            [curr_state_K, 0], np.copy(selected_acs))
+        cat_pred = expit(resulting_final_actions_states_list[:, :, :, -1])
+        cat_pred = np.where(cat_pred > 0.5, np.ones(cat_pred.shape), np.zeros(cat_pred.shape))
+        for i in range(len(self.observation_history)):
+            correct = self.observation_history[i][-1] == cat_pred
+            self.total_prediction_correct[i].append(correct.mean())
+            if self.observation_history[i][-1] == 1:
+                positive_correct = np.mean(cat_pred[i] == 1)
+                self.positive_prediction_correct[i].append(positive_correct)
+            else:
+                negative_correct = np.mean(cat_pred[i] == 0)
+                self.negative_prediction_correct[i].append(negative_correct)
+
 
         #########################################
         ### execute the candidate action sequences on the real dynamics
