@@ -376,7 +376,6 @@ def run_job(args, save_dir=None):
                 for i in range(len(arr)):
                     temp_arr.append(np.mean(arr[i]))
                 return temp_arr
-
             overall_pred_accuracies.append(compute_mean(mpc_rollout.controller_mppi.total_prediction_correct))
             overall_negative_pred_accuracies.append(compute_mean(mpc_rollout.controller_mppi.negative_prediction_correct))
             overall_positive_pred_accuracies.append(compute_mean(mpc_rollout.controller_mppi.positive_prediction_correct))

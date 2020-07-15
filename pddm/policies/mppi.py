@@ -62,7 +62,7 @@ class MPPI(object):
         ## Debugging
         #############
         self.observation_history = []
-        self.positive_prediction_correct = [[] for _ in range(self.horizon)]
+        self.positive_prediction_correct = [[]]
         self.negative_prediction_correct = [[] for _ in range(self.horizon)]
         self.total_prediction_correct = [[] for _ in range(self.horizon)]
 
@@ -216,7 +216,7 @@ class MPPI(object):
             self.total_prediction_correct[i].append(correct.mean())
             if self.observation_history[i][-1] == 1:
                 positive_correct = np.mean(cat_pred[i] == 1)
-                self.positive_prediction_correct[i].append(positive_correct)
+                self.positive_prediction_correct[0].append(positive_correct)
             else:
                 negative_correct = np.mean(cat_pred[i] == 0)
                 self.negative_prediction_correct[i].append(negative_correct)

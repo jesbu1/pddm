@@ -162,6 +162,7 @@ class MPCRollout:
         done = False
         while not(done or step>=self.rollout_length):
 
+
             if self.use_ground_truth_dynamics:
                 print(step)
 
@@ -246,6 +247,12 @@ class MPCRollout:
             #add this new state to end of K list
             curr_state_K = np.append(curr_state_K, np.expand_dims(
                 curr_state, 0), 0)
+            
+            ##### debugging
+            if done:
+                best_action, predicted_states_list = get_action(
+                    step, curr_state_K, actions_taken, starting_fullenvstate,
+                    self.evaluating, take_exploratory_actions)
 
             #save
             traj_taken.append(curr_state)
