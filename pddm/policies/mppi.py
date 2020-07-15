@@ -209,7 +209,7 @@ class MPPI(object):
         selected_acs = np.expand_dims(np.expand_dims(self.mppi_mean, 0), 2)
         resulting_final_actions_states_list = self.dyn_models.do_forward_sim(
             [curr_state_K, 0], np.copy(selected_acs))
-        cat_pred = expit(resulting_final_actions_states_list[:, :, :, -1])
+        cat_pred = expit(np.array(resulting_final_actions_states_list)[:, :, :, -1])
         cat_pred = np.where(cat_pred > 0.5, np.ones(cat_pred.shape), np.zeros(cat_pred.shape))
         for i in range(len(self.observation_history)):
             correct = self.observation_history[i][-1] == cat_pred

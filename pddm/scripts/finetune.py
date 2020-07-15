@@ -371,13 +371,19 @@ def run_job(args, save_dir=None):
                     rollouts_info.append(rollout_info)
 
             rollouts_info_prevIter = rollouts_info.copy()
-            overall_pred_accuracies.append(np.mean(mpc_rollout.controller_mppi.total_prediction_correct, axis=1))
-            overall_negative_pred_accuracies.append(np.mean(mpc_rollout.controller_mppi.negative_prediction_correct, axis=1))
-            overall_positive_pred_accuracies.append(np.mean(mpc_rollout.controller_mppi.positive_prediction_correct, axis=1))
+            def compute_mean(arr):
+                temp_arr = []
+                for i in range(len(arr)):
+                    temp_arr.append(np.mean(arr[i]))
+                return temp_arr
+
+            overall_pred_accuracies.append(compute_mean(mpc_rollout.controller_mppi.total_prediction_correct))
+            overall_negative_pred_accuracies.append(compute_mean(mpc_rollout.controller_mppi.negative_prediction_correct))
+            overall_positive_pred_accuracies.append(compute_mean(mpc_rollout.controller_mppi.positive_prediction_correct))
             print("------- NUM CATASTROPHES: %d ----------" % num_catastrophes)
-            print("------- POS CATATSROPHE PRED ACC: %d ----------" % overall_positive_pred_accuracies[-1])
-            print("------- NEG CATATSROPHE PRED ACC: %d ----------" % overall_negative_pred_accuracies[-1])
-            print("------- CATATSROPHE PRED ACC: %d ----------" % overall_pred_accuracies[-1])
+            print("------- POS CATATSROPHE PRED ACC: %s ----------" % str(overall_positive_pred_accuracies[-1]))
+            print("------- NEG CATATSROPHE PRED ACC: %s ----------" % str(overall_negative_pred_accuracies[-1]))
+            print("------- CATATSROPHE PRED ACC: %s ----------" % str(overall_pred_accuracies[-1]))
             catastrophes.append(num_catastrophes)
             scores.append(np.mean(list_scores))
             rewards.append(np.mean(list_rewards))

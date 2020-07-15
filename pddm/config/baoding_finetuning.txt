@@ -95,7 +95,7 @@
     ],
 'finetuning': [True],
 'test_domain': [0.0255, 0.0265, 0.0275, 0.028, 0.0285, 0.029],
-'beta': [0.25],
+'beta': [0.5],
 'fixed_variance_sampling': [
     False,
     ],
