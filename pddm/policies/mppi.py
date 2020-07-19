@@ -62,9 +62,12 @@ class MPPI(object):
         ## Debugging
         #############
         self.observation_history = []
-        self.positive_prediction_correct = [[]]
-        self.negative_prediction_correct = [[] for _ in range(self.horizon)]
-        self.total_prediction_correct = [[] for _ in range(self.horizon)]
+        self.catastrophe_labels = []
+        self.catastrophe_scores = []
+        self.prediction_history = []
+        #self.positive_prediction_correct = [[]]
+        #self.negative_prediction_correct = [[] for _ in range(self.horizon)]
+        #self.total_prediction_correct = [[] for _ in range(self.horizon)]
 
     ###################################################################
     ###################################################################
@@ -94,9 +97,12 @@ class MPPI(object):
 
     def clear_debugging_vars(self):
         self.observation_history = []
-        self.prediction_correct = [[] for _ in range(self.horizon)]
-        self.negative_prediction_correct = [[] for _ in range(self.horizon)]
-        self.total_prediction_correct = [[] for _ in range(self.horizon)]
+        self.catastrophe_labels = []
+        self.catastrophe_scores = []
+        self.prediction_history = []
+        #self.prediction_correct = [[] for _ in range(self.horizon)]
+        #self.negative_prediction_correct = [[] for _ in range(self.horizon)]
+        #self.total_prediction_correct = [[] for _ in range(self.horizon)]
 
     def get_action(self, step_number, curr_state_K, actions_taken_so_far,
                    starting_fullenvstate, evaluating, take_exploratory_actions):
@@ -105,8 +111,8 @@ class MPPI(object):
         curr_state_K = np.array(curr_state_K)  #[K, sa_dim]
 
         ## Debugging
-        self.observation_history.append(curr_state_K[0])
-        if len(self.observation_history) > self.horizon:
+        self.observation_history.append(curr_state_K[0][-1])
+        if len(self.observation_history) > self.horizon + 1:
             self.observation_history.pop(0)
 
         # remove the 1st entry of mean (mean from past timestep, that was just executed)
@@ -205,21 +211,30 @@ class MPPI(object):
         # Note: mppi_update needs rewards, so pass in -costs
         selected_action = self.mppi_update(-costs, -mean_costs, std_costs, all_samples)
 
+        ## Debugging
+        self.prediction_history.append(np.array(resulting_states_list)[:, -1, :, -1])
+        if len(self.prediction_history) > self.horizon + 1:
+            self.prediction_history.pop(0)
+
         # debugging catastrophe prediction
-        selected_acs = np.expand_dims(np.expand_dims(self.mppi_mean, 0), 2)
-        resulting_final_actions_states_list = self.dyn_models.do_forward_sim(
-            [curr_state_K, 0], np.copy(selected_acs))
-        cat_pred = expit(np.array(resulting_final_actions_states_list)[:, :, :, -1])
-        cat_pred = np.where(cat_pred > 0.5, np.ones(cat_pred.shape), np.zeros(cat_pred.shape))
-        for i in range(len(self.observation_history)):
-            correct = self.observation_history[i][-1] == cat_pred
-            self.total_prediction_correct[i].append(correct.mean())
-            if self.observation_history[i][-1] == 1:
-                positive_correct = np.mean(cat_pred[i] == 1)
-                self.positive_prediction_correct[0].append(positive_correct)
-            else:
-                negative_correct = np.mean(cat_pred[i] == 0)
-                self.negative_prediction_correct[i].append(negative_correct)
+        if len(self.observation_history) == self.horizon + 1:
+            #horizon_steps_ago_state = np.expand_dims(np.array(self.observation_history[0]), 0)
+            #selected_acs = np.expand_dims(np.expand_dims(self.action_history[0], 0), 2)
+            #resulting_final_actions_states_list = self.dyn_models.do_forward_sim(
+            #    [horizon_steps_ago_state, 0], np.copy(selected_acs))
+            #cat_pred = expit(np.array(resulting_states_list)[:, -1, :, -1])
+            #cat_pred = np.where(cat_pred > 0.5, np.ones(cat_pred.shape), np.zeros(cat_pred.shape))
+            self.catastrophe_labels.append(self.observation_history[-1])
+            self.catastrophe_scores.append(self.prediction_history[0])
+        #for i in range(len(self.observation_history)):
+        #    correct = self.observation_history[i][-1] == cat_pred
+        #    self.total_prediction_correct[i].append(correct.mean())
+        #    if self.observation_history[i][-1] == 1:
+        #        positive_correct = np.mean(cat_pred[i] == 1)
+        #        self.positive_prediction_correct[0].append(positive_correct)
+        #    else:
+        #        negative_correct = np.mean(cat_pred[i] == 0)
+        #        self.negative_prediction_correct[i].append(negative_correct)
 
 
         #########################################

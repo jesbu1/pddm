@@ -212,9 +212,11 @@ def run_job(args, save_dir=None):
         catastrophes = []
         rewards = []
         scores = []
-        overall_pred_accuracies = []
-        overall_positive_pred_accuracies = []
-        overall_negative_pred_accuracies = []
+        overall_catastrophe_labels = []
+        overall_catastrophe_scores = []
+        #overall_pred_accuracies = []
+        #overall_positive_pred_accuracies = []
+        #overall_negative_pred_accuracies = []
         while counter < num_iters:
 
             saver_data = DataPerIter()
@@ -376,13 +378,17 @@ def run_job(args, save_dir=None):
                 for i in range(len(arr)):
                     temp_arr.append(np.mean(arr[i]))
                 return temp_arr
-            overall_pred_accuracies.append(compute_mean(mpc_rollout.controller_mppi.total_prediction_correct))
-            overall_negative_pred_accuracies.append(compute_mean(mpc_rollout.controller_mppi.negative_prediction_correct))
-            overall_positive_pred_accuracies.append(compute_mean(mpc_rollout.controller_mppi.positive_prediction_correct))
+            #overall_pred_accuracies.append(compute_mean(mpc_rollout.controller_mppi.total_prediction_correct))
+            #overall_negative_pred_accuracies.append(compute_mean(mpc_rollout.controller_mppi.negative_prediction_correct))
+            #overall_positive_pred_accuracies.append(compute_mean(mpc_rollout.controller_mppi.positive_prediction_correct))
+            overall_catastrophe_labels.append(mpc_rollout.controller_mppi.catastrophe_labels)
+            overall_catastrophe_scores.append(mpc_rollout.controller_mppi.catastrophe_scores)
             print("------- NUM CATASTROPHES: %d ----------" % num_catastrophes)
-            print("------- POS CATATSROPHE PRED ACC: %s ----------" % str(overall_positive_pred_accuracies[-1]))
-            print("------- NEG CATATSROPHE PRED ACC: %s ----------" % str(overall_negative_pred_accuracies[-1]))
-            print("------- CATATSROPHE PRED ACC: %s ----------" % str(overall_pred_accuracies[-1]))
+            #print("------- POS CATATSROPHE PRED ACC: %s ----------" % str(overall_positive_pred_accuracies[-1]))
+            #print("------- NEG CATATSROPHE PRED ACC: %s ----------" % str(overall_negative_pred_accuracies[-1]))
+            #print("------- CATATSROPHE PRED ACC: %s ----------" % str(overall_pred_accuracies[-1]))
+            print("------- NUM LABELS: %d ----------" % len(overall_catastrophe_labels[-1]))
+            print("------- NUM PREDICTIONS: %d ----------" % len(overall_catastrophe_scores[-1]))
             catastrophes.append(num_catastrophes)
             scores.append(np.mean(list_scores))
             rewards.append(np.mean(list_rewards))
@@ -450,9 +456,11 @@ def run_job(args, save_dir=None):
         info_to_save_for_finetuning['rewards'] = rewards
         info_to_save_for_finetuning['scores'] = scores
         info_to_save_for_finetuning['test_domain'] = args.test_domain
-        info_to_save_for_finetuning['overall_cat_pred_acc'] = overall_pred_accuracies
-        info_to_save_for_finetuning['positive_cat_pred_acc'] = overall_positive_pred_accuracies
-        info_to_save_for_finetuning['negative_cat_pred_acc'] = overall_negative_pred_accuracies 
+        #info_to_save_for_finetuning['overall_cat_pred_acc'] = overall_pred_accuracies
+        #info_to_save_for_finetuning['positive_cat_pred_acc'] = overall_positive_pred_accuracies
+        #info_to_save_for_finetuning['negative_cat_pred_acc'] = overall_negative_pred_accuracies 
+        info_to_save_for_finetuning['catastrophe_labels'] = overall_catastrophe_labels
+        info_to_save_for_finetuning['catastrophe_scores'] = overall_catastrophe_scores
         with open(os.path.join(save_dir, 'finetuning_info_%0.3f_cat_pred_%s.pkl' % (args.test_domain, str(args.catastrophe_pred))), 'wb') as f:
             pickle.dump(info_to_save_for_finetuning, f)
         return

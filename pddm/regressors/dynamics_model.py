@@ -350,7 +350,6 @@ class Dyn_Model:
 
     #forward-simulate multiple different action sequences at once
     def do_forward_sim(self, states_true, actions_toPerform):
-
         #init vars
         state_list = []
         N = actions_toPerform.shape[0]
