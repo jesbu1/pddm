@@ -212,7 +212,8 @@ class MPPI(object):
         selected_action = self.mppi_update(-costs, -mean_costs, std_costs, all_samples)
 
         ## Debugging
-        self.prediction_history.append(np.array(resulting_states_list)[:, -1, :, -1])
+        prediction_horizon = 1
+        self.prediction_history.append(np.array(resulting_states_list)[:, -(8 - prediction_horizon), :, -1])
         if len(self.prediction_history) > self.horizon + 1:
             self.prediction_history.pop(0)
 
@@ -225,7 +226,7 @@ class MPPI(object):
             #cat_pred = expit(np.array(resulting_states_list)[:, -1, :, -1])
             #cat_pred = np.where(cat_pred > 0.5, np.ones(cat_pred.shape), np.zeros(cat_pred.shape))
             self.catastrophe_labels.append(self.observation_history[-1])
-            self.catastrophe_scores.append(self.prediction_history[0])
+            self.catastrophe_scores.append(self.prediction_history[self.horizon - prediction_horizon])
         #for i in range(len(self.observation_history)):
         #    correct = self.observation_history[i][-1] == cat_pred
         #    self.total_prediction_correct[i].append(correct.mean())
