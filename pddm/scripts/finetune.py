@@ -461,7 +461,7 @@ def run_job(args, save_dir=None):
         #info_to_save_for_finetuning['negative_cat_pred_acc'] = overall_negative_pred_accuracies 
         info_to_save_for_finetuning['catastrophe_labels'] = overall_catastrophe_labels
         info_to_save_for_finetuning['catastrophe_scores'] = overall_catastrophe_scores
-        with open(os.path.join(save_dir, 'finetuning_info_%0.3f_cat_pred_%s.pkl' % (args.test_domain, str(args.catastrophe_pred))), 'wb') as f:
+        with open(os.path.join(save_dir, 'finetuning_info_%0.4f_cat_pred_%s.pkl' % (args.test_domain, str(args.catastrophe_pred))), 'wb') as f:
             pickle.dump(info_to_save_for_finetuning, f)
         return
 
