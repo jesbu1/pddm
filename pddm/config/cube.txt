@@ -27,8 +27,8 @@
 
 ## env
 'env_name': ['pddm_cube-v0'],
-'rollout_length': [70],
-'num_iters': [200],
+'rollout_length': [100],
+'num_iters': [50],
 'num_trajectories_per_iter': [40],
 
 ## continue
@@ -81,6 +81,16 @@
 'nEpoch': [40],
 'nEpoch_init': [40],
 
+## CARL 
+'catastrophe_pred': [True],
+'finetuning': [False],
+'fixed_variance_sampling': [False],
+'risk_aversion_type': [
+    "state",
+    #"reward",
+],
+'traj_sampling_ratio': [1],
+
 ##########################
 ##### controller
 ##########################
@@ -95,7 +105,7 @@
 'cem_num_elites': [20],
 
 ## mppi
-'mppi_kappa': [10],
+'mppi_kappa': [50],
 'mppi_mag_noise': [0.9],
 'mppi_beta': [0.7],
 

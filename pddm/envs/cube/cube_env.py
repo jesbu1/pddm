@@ -83,6 +83,8 @@ class CubeEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.upper_rng = (self.model.actuator_ctrlrange[:,1]-self.act_mid)
         self.lower_rng = (self.act_mid-self.model.actuator_ctrlrange[:,0])
 
+        self.test_domain = 0
+
 
     def get_reward(self, observations, actions):
 
@@ -177,6 +179,8 @@ class CubeEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # get obs/rew/done/score
         obs = self._get_obs()
         reward, done = self.get_reward(obs, a)
+        catastrophe = done
+        obs = np.concatenate((obs, [float(catastrophe)]))
         score = self.get_score(self.obs_dict)
 
         #return
@@ -219,13 +223,13 @@ class CubeEnv(mujoco_env.MujocoEnv, utils.EzPickle):
                             self.obs_dict['desired_orientation'], #3
                             ])
 
-    def reset_model(self):
+    def reset_model(self, mode='train'):
         self.reset_pose = self.init_qpos.copy()
         self.reset_vel = self.init_qvel.copy()
         self.reset_goal = self.create_goal_trajectory()
-        return self.do_reset(self.reset_pose, self.reset_vel, self.reset_goal)
+        return self.do_reset(self.reset_pose, self.reset_vel, self.reset_goal, mode=mode)
 
-    def do_reset(self, reset_pose, reset_vel, reset_goal=None):
+    def do_reset(self, reset_pose, reset_vel, reset_goal=None, mode="train"):
 
         # reset counts
         self.counter=0
@@ -239,7 +243,7 @@ class CubeEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # reset hand and objects
         self.robot.reset(self, reset_pose, reset_vel)
         self.sim.forward()
-        return self._get_obs()
+        return np.concatenate((self._get_obs(), [0.]))
 
     def create_goal_trajectory(self):
 
