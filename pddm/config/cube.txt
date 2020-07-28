@@ -55,7 +55,7 @@
 'num_rand_rollouts_train': [100],
 'num_rand_rollouts_val': [50],
 'rand_rollout_length': [30],
-'use_threading': [True],
+'use_threading': [False],
 
 ## sample random velocities vs. positions
 'rand_policy_sample_velocities': [True],

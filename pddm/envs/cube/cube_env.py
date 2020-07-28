@@ -15,10 +15,13 @@
 import numpy as np
 from gym import utils
 import os
+from filelock import FileLock
+import xml.etree.ElementTree
 
 from pddm.envs import mujoco_env
 from pddm.envs.robot import Robot
 from pddm.envs.utils.quatmath import euler2quat, quatDiff2Vel
+from pddm.envs.simulation.sim_robot import MujocoSimRobot, RenderMode
 
 class CubeEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
@@ -42,7 +45,7 @@ class CubeEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.n_obj_dofs = 9 ## 6 cube, 9 for cube + target joints
         self.n_dofs = self.n_jnt + self.n_obj_dofs
 
-        xml_path = os.path.join(os.path.dirname(__file__), 'assets', 'shadowhand_hand_cube.xml')
+        self.xml_path = os.path.join(os.path.dirname(__file__), 'assets', 'shadowhand_hand_cube.xml')
 
         # Make robot
         self.robot=Robot(
@@ -57,7 +60,7 @@ class CubeEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.startup = True
         self.initializing = True
         super().__init__(
-            xml_path,
+            self.xml_path,
             frame_skip=frame_skip,
             camera_settings=dict(
                 distance=0.9,
@@ -82,8 +85,34 @@ class CubeEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.act_mid = self.init_qpos[:self.n_jnt]
         self.upper_rng = (self.model.actuator_ctrlrange[:,1]-self.act_mid)
         self.lower_rng = (self.act_mid-self.model.actuator_ctrlrange[:,0])
+        self.xml_location = os.path.join(os.path.dirname(__file__), 'assets', 'object_dice.xml')
 
-        self.test_domain = 0
+        self.domain_low = 0.03
+        self.domain_high = 0.07
+        self.test_domain = 0.05
+    
+    def set_weight(self, weight):
+        lock = FileLock(self.xml_location + '.lock')  # concurrency protection
+        def modify_dice_xml(dice_xml_file):
+            et = xml.etree.ElementTree.parse(dice_xml_file)
+            et.find('body').find('inertial').set('mass', "%0.4f" % weight)  # changing dice weight
+            et.write(dice_xml_file)
+        with lock:
+            modify_dice_xml(self.xml_location)
+            self.sim_robot = MujocoSimRobot(
+                self.xml_path,
+                camera_settings=dict(
+                    distance=0.9,
+                    azimuth=-40,
+                    elevation=-50,
+                ))
+        self.sim = self.sim_robot.sim
+        self.model = self.sim_robot.model
+        self.data = self.sim_robot.data
+        if self.sim_robot.renderer._onscreen_renderer:
+            import ipdb; ipdb.set_trace()
+            self.close()
+            self.render()
 
 
     def get_reward(self, observations, actions):
@@ -119,7 +148,7 @@ class CubeEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         #get vars
         obj_pos = observations[:, (24):(24)+3]
         obj_orientation = observations[:,(24+3):(24+3)+3]
-        desired_orientation = observations[:,-3:]
+        desired_orientation = observations[:,-4:-1]
         obj_height = observations[:,24+2]
         zeros = np.zeros(obj_height.shape)
 
@@ -230,6 +259,16 @@ class CubeEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         return self.do_reset(self.reset_pose, self.reset_vel, self.reset_goal, mode=mode)
 
     def do_reset(self, reset_pose, reset_vel, reset_goal=None, mode="train"):
+        if mode == 'train':
+            self.cube_weight = np.random.uniform(self.domain_low, self.domain_high)
+            print(self.cube_weight)
+            #self.set_weight(self.ball_weights)
+            self.set_weight(self.cube_weight)
+        elif self.mode != 'test' and mode == 'test': #starting adaptation
+            self.ball_weights = self.test_domain
+            self.mode = mode
+            #self.set_weight(self.test_domain)
+            self.set_size(self.test_domain)
 
         # reset counts
         self.counter=0
