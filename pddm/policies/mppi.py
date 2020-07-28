@@ -214,7 +214,7 @@ class MPPI(object):
         selected_action = self.mppi_update(-costs, -mean_costs, std_costs, all_samples)
 
         ## Debugging
-        prediction_horizon = 6
+        prediction_horizon = 7
         #self.prediction_history.append(np.array(resulting_states_list)[:, -(8 - prediction_horizon), :, -1])
         #if len(self.prediction_history) > self.horizon + 1:
         #    self.prediction_history.pop(0)

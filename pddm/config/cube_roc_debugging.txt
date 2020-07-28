@@ -28,12 +28,12 @@
 ## env
 'env_name': ['pddm_cube-v0'],
 'rollout_length': [70],
-'num_iters': [100],
+'num_iters': [1],
 'num_trajectories_per_iter': [40],
 
 ## continue
-'continue_run': [-1],
-'continue_run_filepath': [''],
+'continue_run': [91],
+'continue_run_filepath': ['/home/jesse/pddm/pddm/cube_test2/cube'],
 
 ## some T/F options
 'use_ground_truth_dynamics': [False],
@@ -83,13 +83,15 @@
 
 ## CARL 
 'catastrophe_pred': [True],
-'finetuning': [False],
+'finetuning': [True],
 'fixed_variance_sampling': [False],
 'risk_aversion_type': [
     "state",
     #"reward",
 ],
+'test_domain': [0.0265],
 'traj_sampling_ratio': [1],
+'beta': [0.5],
 
 ##########################
 ##### controller
