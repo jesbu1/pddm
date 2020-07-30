@@ -148,7 +148,7 @@ class CubeEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         #get vars
         obj_pos = observations[:, (24):(24)+3]
         obj_orientation = observations[:,(24+3):(24+3)+3]
-        desired_orientation = observations[:,-4:-1]
+        desired_orientation = observations[:,-3:]
         obj_height = observations[:,24+2]
         zeros = np.zeros(obj_height.shape)
 

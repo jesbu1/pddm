@@ -513,7 +513,7 @@ def main():
 
     for index, job in enumerate(jobs):
         print(job['test_domain'])
-    import pdb; pdb.set_trace()
+    #import pdb; pdb.set_trace()
 
     # Run separate experiment for each variant in the config
     for index, job in enumerate(jobs):
@@ -532,14 +532,14 @@ def main():
 
         #directory name for this experiment
         job['output_dir'] = os.path.join(output_dir, job['job_name'])
-        if general_args.second_half:
-            if index >= 15:
-                print(job['output_dir'])
-                continue
-        else:
-            if index < 15:
-                print(job['output_dir'])
-                continue
+        #if general_args.second_half:
+        #    if index >= 15:
+        #        print(job['output_dir'])
+        #        continue
+        #else:
+        #    if index < 15:
+        #        print(job['output_dir'])
+        #        continue
 
         ################
         ### run job
