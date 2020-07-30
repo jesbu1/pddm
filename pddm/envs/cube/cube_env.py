@@ -87,8 +87,8 @@ class CubeEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.lower_rng = (self.act_mid-self.model.actuator_ctrlrange[:,0])
         self.xml_location = os.path.join(os.path.dirname(__file__), 'assets', 'object_dice.xml')
 
-        self.domain_low = 0.03
-        self.domain_high = 0.07
+        self.domain_low = 0.045
+        self.domain_high = 0.055
         self.test_domain = 0.05
     
     def set_weight(self, weight):
