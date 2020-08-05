@@ -19,7 +19,7 @@ def cost_per_step(pt, prev_pt, costs, actions, dones, reward_func, catastrophe_p
     step_rews, step_dones = reward_func(pt[..., :-1], actions)
     if catastrophe_pred and risk_aversion_type == "state":
         collision = expit(pt[..., -1]) #sigmoids it
-        costs[collision > beta] = 10000
+        costs[collision > beta] += 500
     
 
     dones = np.logical_or(dones, step_dones)
@@ -118,7 +118,6 @@ def calculate_costs(resulting_states_list, actions, reward_func,
         if beta <= 1:
             k_percentile = np.expand_dims(-np.percentile(-new_costs, q=beta * 100, axis=1, interpolation="nearest"), 1)
             cost_mask = new_costs < k_percentile
-        # TODO: Continue from here
         new_costs[cost_mask] = 0
         discounted_sum = np.sum(new_costs, axis=1)
         new_costs[cost_mask] = float('nan')
