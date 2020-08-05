@@ -1,7 +1,7 @@
 <mujoco model="Dice">
 
     <body name="object" pos="-0.00 -0.02 0.24" user="1001 0 2003 27 0 0 0.06 0 0">
-        <inertial diaginertia="6.48e-05 6.48e-05 6.48e-05" mass="0.0584" pos="0 0 0" />
+        <inertial diaginertia="6.48e-05 6.48e-05 6.48e-05" mass="0.0550" pos="0 0 0" />
 
         
         <geom fromto=" 0.0285 -.0285 -.0285  .0285 .0285 -.0285" pos="0 0 0" rgba="1 1 1 1" size=".0050" type="capsule" />

@@ -34,11 +34,11 @@
 ## continue
 'continue_run': [101],
 'continue_run_filepath': [
-    '/nfs/kun1/users/jesbu1/cube_size_adaptation_logs_1/cube'
-    '/nfs/kun1/users/jesbu1/cube_size_adaptation_logs_2/cube'
-    '/nfs/kun1/users/jesbu1/cube_size_adaptation_logs_3/cube'
-    '/nfs/kun1/users/jesbu1/cube_size_adaptation_logs_4/cube'
-    '/nfs/kun1/users/jesbu1/cube_size_adaptation_logs_5/cube'
+    '/nfs/kun1/users/jesbu1/cube_size_adaptation_logs_1/cube',
+    '/nfs/kun1/users/jesbu1/cube_size_adaptation_logs_2/cube',
+    '/nfs/kun1/users/jesbu1/cube_size_adaptation_logs_3/cube',
+    '/nfs/kun1/users/jesbu1/cube_size_adaptation_logs_4/cube',
+    '/nfs/kun1/users/jesbu1/cube_size_adaptation_logs_5/cube',
     ],
 
 ## some T/F options
@@ -97,7 +97,7 @@
 ],
 'test_domain': [0.035, 0.045, 0.055, 0.065, 0.075, 0.085],
 'traj_sampling_ratio': [1],
-'beta': [0.5],
+'beta': [0.75],
 
 ##########################
 ##### controller

@@ -90,6 +90,7 @@ class CubeEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.domain_low = 0.045
         self.domain_high = 0.055
         self.test_domain = 0.05
+        self.mode = 'train'
     
     def set_weight(self, weight):
         lock = FileLock(self.xml_location + '.lock')  # concurrency protection
@@ -265,10 +266,8 @@ class CubeEnv(mujoco_env.MujocoEnv, utils.EzPickle):
             #self.set_weight(self.ball_weights)
             self.set_weight(self.cube_weight)
         elif self.mode != 'test' and mode == 'test': #starting adaptation
-            self.ball_weights = self.test_domain
             self.mode = mode
-            #self.set_weight(self.test_domain)
-            self.set_size(self.test_domain)
+            self.set_weight(self.test_domain)
 
         # reset counts
         self.counter=0
