@@ -27,7 +27,7 @@
 
 ## env
 'env_name': ['pddm_baoding-v0'],
-'rollout_length': [100],
+'rollout_length': [70],
 'num_iters': [15],
 'num_trajectories_per_iter': [30],
 
