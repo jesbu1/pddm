@@ -112,7 +112,7 @@
 ##########################
 
 ## MPC
-'horizon': [7],
+'horizon': [4],
 'num_control_samples': [700],
 'controller_type': ['mppi'],
 'traj_sampling_ratio': [1],
