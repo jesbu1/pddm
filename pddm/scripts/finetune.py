@@ -444,6 +444,10 @@ def run_job(args, save_dir=None):
             #########################################################
             ### save everything about this iter of model training
             #########################################################
+            saver_data.rollouts_rewardsPerIter = rew_perIter
+            saver_data.rollouts_scoresPerIter = scores_perIter
+            saver_data.rollouts_info = rollouts_info
+            saver.save_rollout_info(saver_data)
 
             trainingData_perIter.append(numData_train_rand +
                                         numData_train_onPol)
@@ -452,6 +456,7 @@ def run_job(args, save_dir=None):
             counter = counter + 1
 
             firstTime = False
+            
         info_to_save_for_finetuning['catastrophe'] = catastrophes
         info_to_save_for_finetuning['rewards'] = rewards
         info_to_save_for_finetuning['scores'] = scores
