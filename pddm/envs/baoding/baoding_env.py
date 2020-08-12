@@ -412,9 +412,9 @@ class BaodingEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         self.sim = self.sim_robot.sim
         self.model = self.sim_robot.model
         self.data = self.sim_robot.data
+        self.close()
         if self.sim_robot.renderer._onscreen_renderer:
             import ipdb; ipdb.set_trace()
-            self.close()
             self.render()
 
     def do_reset(self, reset_pose, reset_vel, reset_goal=None, mode="train"):
