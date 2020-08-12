@@ -52,6 +52,7 @@ def vis_iter(args, load_dir):
 
     #create env
     use_env, dt_from_xml = create_env(env_name)
+    use_env.unwrapped_env.test_domain = args.domain
 
     rewards = []
     scores = []
@@ -65,7 +66,8 @@ def vis_iter(args, load_dir):
             use_env,
             params,
             visualize=True,
-            visualize_mpes=args.view_live_mpe_plot)
+            visualize_mpes=args.view_live_mpe_plot,
+            mode="test")
         rewards.append(np.sum(rewards_for_rollout))
         scores.append(np.mean(scores_for_rollout[-5:])) # rollout_meanFinalScore
 
@@ -85,6 +87,7 @@ def main():
     parser.add_argument('--iter_num', type=int, default=1)  #if eval is False, visualize rollouts from this iteration
     parser.add_argument('--eval', action="store_true")  #if this is True, visualize rollouts from rollouts_eval.pickle
     parser.add_argument('--view_live_mpe_plot', action="store_true")
+    parser.add_argument('--domain', type=float, required=True)
     args = parser.parse_args()
 
     ##########################
