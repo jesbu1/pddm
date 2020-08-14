@@ -33,7 +33,7 @@
 
 ## continue
 'continue_run': [-1],
-'continue_run_filepath': ['/home/jesse/pddm/pddm/output_carl_1/baoding'],
+'continue_run_filepath': [''],
 
 ## some T/F options
 'use_ground_truth_dynamics': [False],
@@ -82,7 +82,7 @@
 'nEpoch_init': [40],
 
 ## CARL
-'catastrophe_pred': [True],
+'catastrophe_pred': [False],
 'finetuning': [False],
 'fixed_variance_sampling': [False],
 'risk_aversion_type': [
@@ -96,7 +96,7 @@
 ##########################
 
 ## MPC
-'horizon': [7],
+'horizon': [8],
 'num_control_samples': [1500],
 'controller_type': ['mppi'],
 
@@ -107,6 +107,6 @@
 ## mppi
 'mppi_kappa': [20],
 'mppi_mag_noise': [0.9],
-'mppi_beta': [0.6],
+'mppi_beta': [0.7],
 
 }

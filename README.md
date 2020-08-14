@@ -1,8 +1,9 @@
+# This is the PDDM repo for CARL
+## You can run the Baoding ball manipulation task listed in our paper with this repo. Below follows a modified version of the PDDM Readme with instructions for running CARL/CARL (Reward).
+
 # PDDM
 
-<img src="https://github.com/google-research/pddm/blob/master/pddm/gifs/dclaw_gif.gif" height="200" /> <img src="https://github.com/google-research/pddm/blob/master/pddm/gifs/cube_gif.gif" height="200" /> <img src="https://github.com/google-research/pddm/blob/master/pddm/gifs/handwriting_gif.gif" height="200" /> <img src="https://github.com/google-research/pddm/blob/master/pddm/gifs/baoding_gif.gif" height="200" />
-
-[[Project Page]](https://bit.ly/pddm2019) [[Paper]](https://arxiv.org/abs/1909.11652)
+<img src="https://github.com/google-research/pddm/blob/master/pddm/gifs/baoding_gif.gif" height="200" />
 
 **Deep Dynamics Models for Learning Dexterous Manipulation**<br/>
 [Anusha Nagabandi](https://people.eecs.berkeley.edu/~nagaban2/), Kurt Konolige, Sergey Levine, [Vikash Kumar](https://vikashplus.github.io/).
@@ -67,79 +68,21 @@ The process of (model training + rollout collection) serves as a single iteratio
 To see available parameters to set, see the files in the configs folder, as well as the list of parameters in convert_to_parser_args.py.  <br/><br/>
 
 
-
-
-## C. Train and visualize some tests ##
-
-Cheetah:
-```bash
-python train.py --config ../config/short_cheetah_test.txt --output_dir ../output --use_gpu
-MJPL python visualize_iteration.py --job_path ../output/short_cheetah_test --iter_num 0
-```
-
-Ant:
-```bash
-python train.py --config ../config/short_ant_test.txt --output_dir ../output --use_gpu
-MJPL python visualize_iteration.py --job_path ../output/short_ant_test --iter_num 0
-```
-
-Dclaw turn valve: <br/>
-Note that this will not actually quite work, but might be reasonable.
-```bash
-python train.py --config ../config/short_dclaw_turn_test.txt --output_dir ../output --use_gpu
-MJPL python visualize_iteration.py --job_path ../output/short_dclaw_turn_test --iter_num 0
-```
-
-Dclaw turn valve:<br/>
-Note that this will work well but also take a while to run, because it's using ground-truth Mujoco dynamics for planning. It should take approximately 6 minutes on a standard laptop without any GPU.
-```bash
-python train.py --config ../config/test_dclaw_turn_gt.txt --output_dir ../output --use_gpu
-MJPL python visualize_iteration.py --job_path ../output/dclaw_turn_gt --iter_num 0
-```
-
-Shadowhand in-hand cube rotation:<br/>
-Note that this will work well but also take a while to run, because it's using ground-truth Mujoco dynamics for planning. It should take approximately 6 minutes on a standard laptop without any GPU.
-```bash
-python train.py --config ../config/test_cube_gt.txt --output_dir ../output --use_gpu
-MJPL python visualize_iteration.py --job_path ../output/cube_gt --iter_num 0
-```
-
-Shadowhand Baoding balls:<br/>
-Note that this will work well but also take a while to run, because it's using ground-truth Mujoco dynamics for planning. It should take approximately 20 minutes on a standard laptop without any GPU.
-```bash
-python train.py --config ../config/test_baoding_gt.txt --output_dir ../output --use_gpu
-MJPL python visualize_iteration.py --job_path ../output/baoding_gt --iter_num 0
-```
-<br/><br/>
-
-
 ## D. Run experiments ##
 
 **Train:**
 
 ```bash
-python train.py --config ../config/dclaw_turn.txt --output_dir ../output --use_gpu
 python train.py --config ../config/baoding.txt --output_dir ../output --use_gpu
-python train.py --config ../config/cube.txt --output_dir ../output --use_gpu
 ```
 
-**Evaluate a pre-trained model:**
+**Adaptation:**
 
+First, modify the config file for what you want to run (`../config/baoding_finetuning_CARL.txt`, `../config/baoding_finetuning_pddm.txt`, or `../config/baoding_finetuning_CARL_reward.txt`) and fill in the `continue_run_filepath` argument with a list of file locations of wherever the runs you ran are.
+
+Then, 
 ```bash
-python eval_iteration.py --job_path ../output/dclaw_turn --iter_num 0 --num_eval_rollouts 1 --eval_run_length 40
+python finetune.py --config ../config/baoding_finetuning_[CARL/pddm/CARL_reward].txt --output_dir ../finetuning_output --use_gpu
 ```
 
-**Visualize:**
-
-```bash
-MJPL python visualize_iteration.py --job_path ../output/dclaw_turn --eval
-MJPL python visualize_iteration.py --job_path ../output/dclaw_turn --iter_num 0
-```
-
-**Compare runs:**
-
-Plot rewards (or scores) of multiple runs on the same plot. Note that custom labels are optional:
-```bash
-python compare_results.py -j ../output/runA ../output/runB -l 'mycustomlabel runA' -l 'mycustomlabel runB' --plot_rew
-python compare_results.py -j ../output/runA ../output/runB -l 'mycustomlabel runA' -l 'mycustomlabel runB'
-```
+Results are saved in the `finetuning...pkl` file that will be stored in the output directory.
